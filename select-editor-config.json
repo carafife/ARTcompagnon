@@ -1,0 +1,34 @@
+{
+  "editors": [
+    {
+      "name": "GIMP",
+      "description": "GNU Image Manipulation Program",
+      "command": "gimp"
+    },
+    {
+      "name": "Geeqie",
+      "description": "Image Viewer",
+      "command": "geeqie"
+    },
+    {
+      "name": "Hugin",
+      "description": "Panorama Creator",
+      "command": "/usr/bin/hugin"
+    },
+    {
+      "name": "Luminance HDR",
+      "description": "HDR Image Processing",
+      "command": "/usr/bin/luminance-hdr"
+    },
+    {
+      "name": "RawTherapee",
+      "description": "Raw Image Processor",
+      "command": "/usr/bin/rawtherapee"
+    },
+    {
+      "name": "Lightzone",
+      "description": "Photo Editor",
+      "command": "flatpak run io.github.ktgw0316.LightZone"
+    }
+  ]
+}
