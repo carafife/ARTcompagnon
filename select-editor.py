@@ -276,7 +276,8 @@ class ARTCompanion(QDialog):
         if item:
             editor = item.data(Qt.UserRole)
             try:
-                subprocess.Popen([editor['command'], self.image_file])
+                command = os.path.expandvars(os.path.expanduser(editor['command']))
+                subprocess.Popen([command, self.image_file])
                 self.accept()
             except Exception as e:
                 QMessageBox.critical(self, "Erreur", f"Impossible de lancer {editor['name']}: {e}")
