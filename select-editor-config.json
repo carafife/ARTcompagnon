@@ -28,7 +28,7 @@
     {
       "name": "Lightzone",
       "description": "Photo Editor",
-      "command": "flatpak run io.github.ktgw0316.LightZone"
+      "command": "$HOME/Programmes/ARTcompagnon/custom-tasks/lightzone-wrapper.sh"
     }
   ]
 }

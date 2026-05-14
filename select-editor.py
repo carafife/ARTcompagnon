@@ -64,7 +64,8 @@ class ARTCompanion(QDialog):
         self.config_file = config_file
         self.image_file = image_file
         self.logo_path = logo_path
-        self.scripts_dir = os.path.expanduser("~/.config/ART/usercommands")
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        self.scripts_dir = os.path.join(script_dir, "custom-tasks")
         self.load_config()
         self.init_ui()
         self.apply_theme()
@@ -92,7 +93,7 @@ class ARTCompanion(QDialog):
             json.dump(self.config, f, indent=2)
     
     def init_ui(self):
-        self.setWindowTitle("Le ARTherapee Compagnon 🇫🇷")
+        self.setWindowTitle("Le ARTherapee Compagnon v1.1-beta 🇫🇷")
         self.setGeometry(100, 100, 700, 580)
         self.setMinimumSize(700, 580)
         
@@ -276,7 +277,8 @@ class ARTCompanion(QDialog):
         if item:
             editor = item.data(Qt.UserRole)
             try:
-                subprocess.Popen([editor['command'], self.image_file])
+                command = os.path.expandvars(os.path.expanduser(editor['command']))
+                subprocess.Popen([command, self.image_file])
                 self.accept()
             except Exception as e:
                 QMessageBox.critical(self, "Erreur", f"Impossible de lancer {editor['name']}: {e}")
