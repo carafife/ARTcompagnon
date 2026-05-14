@@ -29,6 +29,11 @@
       "name": "LightZone",
       "description": "Editeur",
       "command": "$HOME/Programmes/ARTcompagnon/custom-tasks/lightzone-wrapper.sh"
+    },
+    {
+      "name": "Lightzone",
+      "description": "Photo Editor",
+      "command": "$HOME/Programmes/ARTcompagnon/custom-tasks/lightzone-wrapper.sh"
     }
   ]
 }
