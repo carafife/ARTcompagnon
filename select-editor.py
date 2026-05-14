@@ -10,10 +10,10 @@ class OutputEmitter(QObject):
     output_signal = pyqtSignal(str)
 
 class TerminalWindow(QDialog):
-    def __init__(self, script_path, image_file):
+    def __init__(self, script_path, image_files):
         super().__init__()
         self.script_path = script_path
-        self.image_file = image_file
+        self.image_files = image_files if isinstance(image_files, list) else [image_files]
         self.init_ui()
         self.run_script()
     
@@ -36,7 +36,7 @@ class TerminalWindow(QDialog):
     def run_script(self):
         def execute():
             try:
-                process = subprocess.Popen(['bash', self.script_path, self.image_file],
+                process = subprocess.Popen(['bash', self.script_path] + self.image_files,
                                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                          text=True, bufsize=1)
                 for line in process.stdout:
@@ -59,10 +59,10 @@ class TerminalWindow(QDialog):
         self.output.setTextCursor(cursor)
 
 class ARTCompanion(QDialog):
-    def __init__(self, config_file, image_file, logo_path):
+    def __init__(self, config_file, image_files, logo_path):
         super().__init__()
         self.config_file = config_file
-        self.image_file = image_file
+        self.image_files = image_files if isinstance(image_files, list) else [image_files]
         self.logo_path = logo_path
         self.scripts_dir = os.path.expanduser("~/.config/ART/usercommands")
         self.load_config()
@@ -276,7 +276,9 @@ class ARTCompanion(QDialog):
         if item:
             editor = item.data(Qt.UserRole)
             try:
-                subprocess.Popen([editor['command'], self.image_file])
+                cmd = editor['command']
+                cmd = os.path.expandvars(os.path.expanduser(cmd))
+                subprocess.Popen([cmd] + self.image_files)
                 self.accept()
             except Exception as e:
                 QMessageBox.critical(self, "Erreur", f"Impossible de lancer {editor['name']}: {e}")
@@ -353,10 +355,10 @@ class ARTCompanion(QDialog):
             if script_name.endswith('.sh'):
                 term_cmd = self.find_terminal()
                 if term_cmd:
-                    cmd = [t.format(script=script_path, file=self.image_file) for t in term_cmd]
+                    cmd = [t.format(script=script_path, file=' '.join(self.image_files)) for t in term_cmd]
                     subprocess.Popen(cmd)
                 else:
-                    term_win = TerminalWindow(script_path, self.image_file)
+                    term_win = TerminalWindow(script_path, self.image_files)
                     term_win.exec_()
             else:
                 QMessageBox.information(self, "Info", f"Script: {script_name}\n\nCe type de script nécessite une configuration ART spécifique.")
@@ -394,5 +396,5 @@ if __name__ == "__main__":
         print(f"Config not found: {config}")
         sys.exit(1)
     app = QApplication(sys.argv)
-    companion = ARTCompanion(config, sys.argv[1], logo)
+    companion = ARTCompanion(config, sys.argv[1:], logo)
     companion.exec_()
