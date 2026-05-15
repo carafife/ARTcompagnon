@@ -6,34 +6,9 @@
       "command": "gimp"
     },
     {
-      "name": "Geeqie",
-      "description": "Image Viewer",
-      "command": "geeqie"
-    },
-    {
-      "name": "Hugin",
-      "description": "Panorama Creator",
-      "command": "/usr/bin/hugin"
-    },
-    {
-      "name": "Luminance HDR",
-      "description": "HDR Image Processing",
-      "command": "/usr/bin/luminance-hdr"
-    },
-    {
       "name": "RawTherapee",
       "description": "Raw Image Processor",
-      "command": "/usr/bin/rawtherapee"
-    },
-    {
-      "name": "Lightzone",
-      "description": "Photo Editor",
-      "command": "flatpak run io.github.ktgw0316.LightZone"
-    },
-    {
-      "name": "HDR Merge",
-      "description": "Fusion d'exposition",
-      "command": "/home/carafife/Programmes/bin/hdrmerge"
+      "command": "rawtherapee"
     }
   ]
 }
