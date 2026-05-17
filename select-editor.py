@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys, json, subprocess, os, shutil, threading
-from PyQt5.QtWidgets import (QApplication, QDialog, QVBoxLayout, QHBoxLayout, QListWidget, 
+from PyQt5.QtWidgets import (QApplication, QDialog, QVBoxLayout, QHBoxLayout, QListWidget, QTreeWidget, QTreeWidgetItem, 
                               QListWidgetItem, QPushButton, QLabel, QTabWidget, QWidget, 
                               QLineEdit, QComboBox, QMessageBox, QFileDialog, QTextEdit)
 from PyQt5.QtCore import Qt, QSize, pyqtSignal, QObject
@@ -65,6 +65,11 @@ class ARTCompanion(QDialog):
         self.image_files = image_files if isinstance(image_files, list) else [image_files]
         self.logo_path = logo_path
         self.scripts_dir = os.path.expanduser("~/.config/ART/usercommands")
+        
+        # Créer les dossiers de scripts s'ils n'existent pas
+        for folder in ['bash', 'python', 'lua']:
+            folder_path = os.path.join(self.scripts_dir, folder)
+            os.makedirs(folder_path, exist_ok=True)
         self.load_config()
         self.init_ui()
         self.apply_theme()
@@ -92,7 +97,7 @@ class ARTCompanion(QDialog):
             json.dump(self.config, f, indent=2)
     
     def init_ui(self):
-        self.setWindowTitle("Le ARTherapee Compagnon 🇫🇷")
+        self.setWindowTitle("Le ARTherapee Compagnon 🇫🇷 v1.5.2-beta")
         self.setGeometry(100, 100, 700, 580)
         self.setMinimumSize(700, 580)
         
@@ -238,9 +243,10 @@ class ARTCompanion(QDialog):
         btn_layout.addStretch()
         layout.addLayout(btn_layout)
         layout.addWidget(QLabel("Scripts disponibles:"))
-        self.scripts_list = QListWidget()
+        self.scripts_tree = QTreeWidget()
+        self.scripts_tree.setHeaderLabel('Scripts disponibles')
         self.refresh_scripts_list()
-        layout.addWidget(self.scripts_list)
+        layout.addWidget(self.scripts_tree)
         exec_layout = QHBoxLayout()
         exec_layout.setSpacing(10)
         exec_btn = QPushButton("▶️ Exécuter")
@@ -314,72 +320,99 @@ class ARTCompanion(QDialog):
     
     def load_script(self):
         file_dialog = QFileDialog()
-        file_path, _ = file_dialog.getOpenFileName(self, "Sélectionner un script", os.path.expanduser("~"), "Scripts (*.sh *.txt);;Tous les fichiers (*)")
+        file_path, _ = file_dialog.getOpenFileName(self, "Sélectionner un script", os.path.expanduser("~"), "Scripts (*.sh *.py *.lua *.txt);;Tous les fichiers (*)")
         if file_path:
             filename = os.path.basename(file_path)
-            dest_path = os.path.join(self.scripts_dir, filename)
+            
+            # Détecter le type et le dossier destination
+            if filename.endswith('.sh'):
+                dest_folder = 'bash'
+            elif filename.endswith('.py'):
+                dest_folder = 'python'
+            elif filename.endswith('.lua'):
+                dest_folder = 'lua'
+            else:
+                dest_folder = 'bash'  # défaut
+            
+            dest_dir = os.path.join(self.scripts_dir, dest_folder)
+            os.makedirs(dest_dir, exist_ok=True)
+            dest_path = os.path.join(dest_dir, filename)
+            
             try:
                 shutil.copy2(file_path, dest_path)
                 os.chmod(dest_path, 0o755)
                 self.refresh_scripts_list()
-                QMessageBox.information(self, "Succès", f"Script '{filename}' importé!")
+                QMessageBox.information(self, "Succès", f"Script '{filename}' importé dans {dest_folder}/!")
             except Exception as e:
                 QMessageBox.critical(self, "Erreur", f"Impossible d'importer le script: {e}")
     
     def refresh_scripts_list(self):
-        self.scripts_list.clear()
+        self.scripts_tree.clear()
         if not os.path.exists(self.scripts_dir):
             os.makedirs(self.scripts_dir, exist_ok=True)
-        scripts = [f for f in os.listdir(self.scripts_dir) if f.endswith('.txt') or f.endswith('.sh')]
-        scripts = [s for s in scripts if s != 'select-editor.txt']
-        if not scripts:
-            self.scripts_list.addItem("  📭 Aucun script trouvé")
-            return
-        for script in sorted(scripts):
-            ext = "📄" if script.endswith('.txt') else "🔧"
-            item = QListWidgetItem(f"  {ext} {script}")
-            item.setData(Qt.UserRole, script)
-            item.setSizeHint(QSize(650, 40))
-            self.scripts_list.addItem(item)
+        
+        folders = {'bash': '🔧', 'python': '🐍', 'lua': '🌙'}
+        found = False
+        
+        for folder_name, icon in folders.items():
+            folder_path = os.path.join(self.scripts_dir, folder_name)
+            if os.path.isdir(folder_path):
+                scripts = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
+                if scripts:
+                    folder_item = QTreeWidgetItem([f'{icon} {folder_name.upper()}'])
+                    self.scripts_tree.addTopLevelItem(folder_item)
+                    found = True
+                    for script in sorted(scripts):
+                        child = QTreeWidgetItem([script])
+                        child.setData(0, Qt.UserRole, os.path.join(folder_name, script))
+                        folder_item.addChild(child)
+                    folder_item.setExpanded(True)
+        
+        if not found:
+            empty = QTreeWidgetItem(['📭 Aucun script trouvé'])
+            self.scripts_tree.addTopLevelItem(empty)
     
     def execute_selected_script(self):
-        item = self.scripts_list.currentItem()
-        if not item or item.text().strip() == "📭 Aucun script trouvé":
+        item = self.scripts_tree.currentItem()
+        if not item or item.text(0) == '📭 Aucun script trouvé':
             QMessageBox.warning(self, "Erreur", "Sélectionnez un script!")
             return
         
-        script_name = item.data(Qt.UserRole)
-        script_path = os.path.join(self.scripts_dir, script_name)
+        script_rel = item.data(0, Qt.UserRole)
+        if not script_rel:
+            QMessageBox.warning(self, "Erreur", "Sélectionnez un script (pas un dossier)!")
+            return
+        
+        script_path = os.path.join(self.scripts_dir, script_rel)
+        script_name = os.path.basename(script_rel)
         
         try:
             if script_name.endswith('.sh'):
-                term_cmd = self.find_terminal()
-                if term_cmd:
-                    cmd = [t.format(script=script_path, file=' '.join(self.image_files)) for t in term_cmd]
-                    subprocess.Popen(cmd)
-                else:
-                    term_win = TerminalWindow(script_path, self.image_files)
-                    term_win.exec_()
+                subprocess.Popen(['gnome-terminal', '--', 'bash', script_path] + self.image_files)
+            elif script_name.endswith('.py'):
+                subprocess.Popen(['gnome-terminal', '--', 'python3', script_path] + self.image_files)
+            elif script_name.endswith('.lua'):
+                subprocess.Popen(['gnome-terminal', '--', 'lua', script_path] + self.image_files)
             else:
-                QMessageBox.information(self, "Info", f"Script: {script_name}\n\nCe type de script nécessite une configuration ART spécifique.")
+                QMessageBox.warning(self, "Erreur", f"Type non supporté: {script_name}")
         except Exception as e:
-            QMessageBox.critical(self, "Erreur", f"Impossible d'exécuter le script:\n{str(e)}")
+            QMessageBox.critical(self, "Erreur", f"Impossible d'exécuter: {str(e)}")
     
     def remove_script(self):
-        item = self.scripts_list.currentItem()
-        if not item or item.text().strip() == "📭 Aucun script trouvé":
+        item = self.scripts_tree.currentItem()
+        if not item or item.data(0, Qt.UserRole) is None:
             QMessageBox.warning(self, "Erreur", "Sélectionnez un script!")
             return
-        script_name = item.data(Qt.UserRole)
-        script_path = os.path.join(self.scripts_dir, script_name)
-        reply = QMessageBox.question(self, "Confirmer", f"Supprimer '{script_name}'?", QMessageBox.Yes | QMessageBox.No)
+        script_rel = item.data(0, Qt.UserRole)
+        script_path = os.path.join(self.scripts_dir, script_rel)
+        reply = QMessageBox.question(self, "Confirmer", f"Supprimer '{os.path.basename(script_rel)}'?", QMessageBox.Yes | QMessageBox.No)
         if reply == QMessageBox.Yes:
             try:
                 os.remove(script_path)
                 self.refresh_scripts_list()
                 QMessageBox.information(self, "Succès", "Script supprimé!")
             except Exception as e:
-                QMessageBox.critical(self, "Erreur", f"Impossible de supprimer le script: {e}")
+                QMessageBox.critical(self, "Erreur", f"Impossible de supprimer: {e}")
     
     def apply_theme(self):
         dark_stylesheet = """QDialog, QWidget { background-color: #1a1a1a; color: #e8e8e8; } QLabel { color: #e8e8e8; } QListWidget, QLineEdit, QComboBox, QTextEdit { background-color: #252525; border: 1px solid #3a3a3a; color: #e8e8e8; border-radius: 4px; padding: 5px; } QListWidget::item { padding: 8px; border-radius: 4px; } QListWidget::item:selected { background-color: #c97d3a; color: #ffffff; } QListWidget::item:hover { background-color: #2f2f2f; } QPushButton { background-color: #c97d3a; color: #ffffff; border: none; border-radius: 4px; font-weight: bold; font-size: 10px; padding: 3px; font-family: Sans; } QPushButton:hover { background-color: #d9945a; } QPushButton:pressed { background-color: #b96b2a; } QTabWidget::pane { border: 1px solid #3a3a3a; } QTabBar::tab { background-color: #252525; color: #e8e8e8; padding: 5px 15px; border: 1px solid #3a3a3a; } QTabBar::tab:selected { background-color: #c97d3a; color: #ffffff; }"""
