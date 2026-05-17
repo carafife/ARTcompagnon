@@ -240,6 +240,19 @@ class ARTCompanion(QDialog):
         refresh_btn.setMinimumHeight(32)
         refresh_btn.clicked.connect(self.refresh_scripts_list)
         btn_layout.addWidget(refresh_btn)
+        
+        cache_config_btn = QPushButton("📁 Config cache")
+        cache_config_btn.setMaximumWidth(140)
+        cache_config_btn.setMinimumHeight(32)
+        cache_config_btn.clicked.connect(self.configure_cache_folder)
+        btn_layout.addWidget(cache_config_btn)
+        
+        cache_clean_btn = QPushButton("🗑️ Nettoyer cache")
+        cache_clean_btn.setMaximumWidth(140)
+        cache_clean_btn.setMinimumHeight(32)
+        cache_clean_btn.clicked.connect(self.clean_cache_folder)
+        btn_layout.addWidget(cache_clean_btn)
+        
         btn_layout.addStretch()
         layout.addLayout(btn_layout)
         layout.addWidget(QLabel("Scripts disponibles:"))
@@ -413,6 +426,57 @@ class ARTCompanion(QDialog):
                 QMessageBox.information(self, "Succès", "Script supprimé!")
             except Exception as e:
                 QMessageBox.critical(self, "Erreur", f"Impossible de supprimer: {e}")
+    
+    def configure_cache_folder(self):
+        """Ouvre un dialogue pour configurer le dossier cache"""
+        cache_folder = QFileDialog.getExistingDirectory(
+            self,
+            "Sélectionner le dossier cache ART",
+            os.path.expanduser("~/.cache/ART")
+        )
+        if cache_folder:
+            import json
+            config_file = os.path.join(os.path.dirname(__file__), 'cache_config.json')
+            with open(config_file, 'w') as f:
+                json.dump({"cache_folder": cache_folder}, f)
+            QMessageBox.information(self, "Succès", f"Cache configuré: {cache_folder}")
+    
+    def clean_cache_folder(self):
+        """Nettoie les fichiers .tif du dossier cache"""
+        import json
+        cache_folder = os.path.expanduser("~/.cache/ART/temp")
+        
+        # Essayer de charger la config si elle existe
+        config_file = os.path.join(os.path.dirname(__file__), 'cache_config.json')
+        if os.path.exists(config_file):
+            try:
+                with open(config_file, 'r') as f:
+                    config = json.load(f)
+                    cache_folder = config.get("cache_folder", cache_folder)
+            except:
+                pass
+        
+        if not os.path.exists(cache_folder):
+            QMessageBox.warning(self, "Erreur", f"Dossier introuvable: {cache_folder}")
+            return
+        
+        try:
+            tif_files = [f for f in os.listdir(cache_folder) if f.endswith(('.tif', '.TIF'))]
+            if not tif_files:
+                QMessageBox.information(self, "Info", "Aucun fichier .tif à supprimer")
+                return
+            
+            total_size = 0
+            for f in tif_files:
+                filepath = os.path.join(cache_folder, f)
+                total_size += os.path.getsize(filepath)
+                os.remove(filepath)
+            
+            size_mb = total_size / (1024 * 1024)
+            msg = f"✅ Cache nettoyé!\n{len(tif_files)} fichier(s) supprimé(s)\n{size_mb:.1f} MB libérés"
+            QMessageBox.information(self, "Succès", msg)
+        except Exception as e:
+            QMessageBox.critical(self, "Erreur", f"Erreur lors du nettoyage: {e}")
     
     def apply_theme(self):
         dark_stylesheet = """QDialog, QWidget { background-color: #1a1a1a; color: #e8e8e8; } QLabel { color: #e8e8e8; } QListWidget, QLineEdit, QComboBox, QTextEdit { background-color: #252525; border: 1px solid #3a3a3a; color: #e8e8e8; border-radius: 4px; padding: 5px; } QListWidget::item { padding: 8px; border-radius: 4px; } QListWidget::item:selected { background-color: #c97d3a; color: #ffffff; } QListWidget::item:hover { background-color: #2f2f2f; } QPushButton { background-color: #c97d3a; color: #ffffff; border: none; border-radius: 4px; font-weight: bold; font-size: 10px; padding: 3px; font-family: Sans; } QPushButton:hover { background-color: #d9945a; } QPushButton:pressed { background-color: #b96b2a; } QTabWidget::pane { border: 1px solid #3a3a3a; } QTabBar::tab { background-color: #252525; color: #e8e8e8; padding: 5px 15px; border: 1px solid #3a3a3a; } QTabBar::tab:selected { background-color: #c97d3a; color: #ffffff; }"""
