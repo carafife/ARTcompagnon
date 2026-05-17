@@ -97,7 +97,7 @@ class ARTCompanion(QDialog):
             json.dump(self.config, f, indent=2)
     
     def init_ui(self):
-        self.setWindowTitle("Le ARTherapee Compagnon 🇫🇷 v1.5.2-beta")
+        self.setWindowTitle("Le ARTherapee Compagnon 🇫🇷 v1.5")
         self.setGeometry(100, 100, 700, 580)
         self.setMinimumSize(700, 580)
         
