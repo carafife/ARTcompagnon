@@ -62,14 +62,14 @@ sed -i "s|\$HOME|$HOME|" ~/.config/ART/usercommands/nind_denoise.txt
 ## Intégration ARTcompagnon
 
 ### SMART
-cat > ~/Programmes/ARTcompagnon/custom-tasks/smart_masking.sh << 'EOF'
+cat > ~/.config/ART/usercommands/bash/smart_masking.sh << 'EOF'
 #!/bin/bash
 SMART_DIR="$HOME/Programmes/SMART"
 cd "$SMART_DIR"
 source SMART-env/bin/activate
 python src/main.py "$@"
 EOF
-chmod +x ~/Programmes/ARTcompagnon/custom-tasks/smart_masking.sh
+chmod +x ~/.config/ART/usercommands/bash/smart_masking.sh
 
 ### Formats
 sed -i 's/FileType=raw/FileType=jpg|jpeg|tif|tiff|png/' ~/.config/ART/usercommands/select-editor.txt

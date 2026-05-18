@@ -1,0 +1,191 @@
+# 🎨 ARTcompagnon - CONTEXT_PROMPT_v3.txt
+**Créé:** 17 mai 2026 | **Mot-clé:** @ARTCOMPAGNON-CONTEXT
+
+---
+
+## 📌 VERSIONS OFFICIELLES
+
+**main = v1.5 OFFICIELLE (Stable)** ✅
+- Bash + Python + Lua support complet
+- QTreeWidget arborescence avec expand/collapse
+- Import intelligent (détecte type script)
+- Exécution gnome-terminal
+- README.md à jour
+
+**test = v1.5-beta (Development)** 🚀
+- Reparti depuis main
+- Prêt pour futures améliorations
+
+---
+
+## 🏗️ ARCHITECTURE DOSSIERS USERCOMMANDS
+
+```
+~/.config/ART/usercommands/
+├── bash/                    ← Scripts bash
+│   ├── script1.sh
+│   ├── script2.sh
+│   └── ...
+├── python/                  ← Scripts Python
+│   ├── script1.py
+│   ├── script2.py
+│   └── ...
+└── lua/                     ← Scripts Lua
+    ├── script1.lua
+    ├── script2.lua
+    └── ...
+```
+
+**Auto-créés au 1er lancement d'AC!**
+
+---
+
+## 🎯 CHEMINS CRITIQUES
+
+```
+REPO GIT (main/test):       ~/art-compagnon/ (lowercase!)
+Main select-editor.py:       ~/art-compagnon/select-editor.py
+
+USERCOMMANDS OFFICIELS:
+  Bash scripts:             ~/.config/ART/usercommands/bash/
+  Python scripts:           ~/.config/ART/usercommands/python/
+  Lua scripts:              ~/.config/ART/usercommands/lua/
+
+OUTILS EXTERNES:
+  ART:                      ~/Programmes/ART/
+  SMART:                    ~/Programmes/SMART/
+  nind-denoise:             ~/Programmes/nind-denoise/
+  ART-ctlscripts:           ~/Programmes/ART-ctlscripts/
+
+CONFIG ART:
+  Base:                     ~/.config/ART/
+  CTL scripts:              ~/.config/ART/ctlscripts/
+  SMART config:             ~/.config/ART/SMART.json
+  Cache (à nettoyer):       ~/.cache/ART/profiles/
+
+TEMP:                       /tmp/ (nettoyer *.tif/*.TIF)
+```
+
+---
+
+## ✅ SOLUTIONS CRITIQUES
+
+### 1. CTL FIX (ART compilation)
+```bash
+cmake .. -DENABLE_CTL=ON -DCTL_INCLUDE_DIR=/usr/include/CTL
+```
+
+### 2. AC FIX (NumArgs usercommand)
+```
+NumArgs=1
+```
+(IMPORTANT: Dans ~/.config/ART/usercommands/select-editor.txt)
+
+### 3. /TMP FIX (Espace disque)
+```bash
+rm -rf /tmp/*.tif /tmp/*.TIF
+```
+
+### 4. .ARP CACHE FIX (Profils corrompus)
+```bash
+rm -rf ~/.cache/ART/profiles/
+```
+
+---
+
+## 🔄 WORKFLOW GIT STRICT
+
+### ⚠️ RÈGLE D'OR
+- ❌ JAMAIS modifier/committer sur main
+- ✅ TOUJOURS committer sur test
+- ✅ Merger test → main quand validé + créer tag
+
+### Process
+```bash
+# 1. Sur test (développement)
+git checkout test
+git add .
+git commit -m "..."
+git push
+
+# 2. Tester (utilisateurs/testeurs)
+
+# 3. Merger vers main (une fois validé)
+git checkout main
+git merge test
+git tag vX.X
+git push
+```
+
+### Versions Autorisées
+- **main:** v1.0, v1.5, v2.0, v2.5, etc. (UNIQUEMENT .0 ou .5!)
+- **test:** v1.5-beta, v1.5.1-beta, etc. (version patch beta uniquement)
+
+---
+
+## 🛠️ TECHNOLOGIES EMPLOYÉES
+
+### ARTcompagnon (AC)
+- **Language:** Python 3 + PyQt5
+- **Support scripts:** Bash, Python 3, Lua
+- **UI:** QTreeWidget (arborescence), gnome-terminal (exécution)
+- **Config:** ~/.config/ART/usercommands/select-editor.txt
+
+### SMART (SAM2 Mask Builder)
+- **Format:** JPG/TIF/PNG UNIQUEMENT (pas RAW!)
+- **Device:** device=cpu (AMD Radeon)
+- **Model:** sam2.1_hiera_base_plus.pt
+- **Config:** ~/.config/ART/SMART.json
+
+### nind-denoise (AI Denoiser)
+- **Format:** RAW UNIQUEMENT
+- **Device:** cpu (AMD Radeon)
+- **Output:** -denoised.tif
+
+### ART CTL Scripts
+- **Dépendances Fedora:** ctl, CTL-devel, openexr, openexr-devel
+- **ART compilation:** -DENABLE_CTL=ON
+- **Dossier:** ~/.config/ART/ctlscripts/
+
+---
+
+## 🚨 POINTS D'ATTENTION IMPORTANTS
+
+1. **Repo correct:** ~/art-compagnon/ (minuscule, pas ~/ARTcompagnon/)
+2. **SMART:** Exporter RAW → JPG avant de l'utiliser
+3. **CTL:** Recompiler ART avec ENABLE_CTL=ON
+4. **GPU:** AMD Radeon = device=cpu (JAMAIS CUDA)
+5. **AC vs usercommands:** AC = depuis éditeur ART | usercommands = depuis navigateur fichiers
+6. **Nettoyage:** /tmp/*.tif + ~/.cache/ART/profiles/ régulièrement
+
+---
+
+## 📚 FICHIERS CLÉS
+
+- **select-editor.py** - App AC principale (support bash/python/lua + QTreeWidget)
+- **select-editor-config.json** - Config des éditeurs externes
+- **README.md** - Documentation v1.5 (bash/python/lua)
+- **GUIDE_1.2.md** - Guide complet des scripts
+- **PROJECT_ARCHITECTURE.md** - Architecture technique (LOCAL, non-versionné)
+- **CONTEXT_PROMPT_v3.txt** - Ce fichier (LOCAL, non-versionné)
+
+---
+
+## 🔗 RÉFÉRENCES
+
+- ARTcompagnon: https://github.com/carafife/ARTcompagnon
+- ART: https://github.com/agriggio/art
+- SMART: https://github.com/artraweditor/SMART
+- SAM2: https://github.com/facebookresearch/sam2
+- nind-denoise: https://github.com/agriggio/nind-denoise
+
+---
+
+## 📋 ROADMAP FUTURE
+
+- PHASE 2: Thèmes ART dark/light + switch FR/EN + aide contextuelle
+- PHASE 3: Logo/branding
+
+---
+
+**Pour relancer ce contexte:** Dis `@ARTCOMPAGNON-CONTEXT` à Claude!

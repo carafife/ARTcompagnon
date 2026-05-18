@@ -1,25 +1,22 @@
-# 📖 Guide d'Installation - Le ARTherapee Compagnon
+# 📖 Guide d'Installation - Le ARTherapee Compagnon v1.5.4
 
 ## 🚀 Installation automatisée (recommandée)
 
 ### Étape 1 : Cloner le dépôt
-
 ```bash
 cd ~
 git clone https://github.com/votre-username/ARTcompagnon.git
-cd ARTcompagnon
+cd art-compagnon
 ```
 
 ### Étape 2 : Lancer l'installation
-
 ```bash
 ./install.sh
 ```
 
 C'est tout ! Le script crée automatiquement :
-- ✅ Le dossier de configuration ART
-- ✅ Le dossier de l'application dans `/home/votre-user/Programmes/ARTcompagnon/`
-- ✅ Le dossier pour les scripts personnalisés
+- ✅ Le fichier de configuration dans `~/.config/ART/usercommands/`
+- ✅ Les dossiers pour les scripts (`bash/`, `python/`, `lua/`)
 
 ---
 
@@ -27,7 +24,7 @@ C'est tout ! Le script crée automatiquement :
 
 ### Système
 - **Linux** (Fedora, Ubuntu, Debian, etc.)
-- **ART** installé (https://artherapee.fr/)
+- **ART** installé (https://github.com/agriggio/art)
 
 ### Logiciels
 ```bash
@@ -49,14 +46,13 @@ sudo apt install python3 python3-pyqt5 git gnome-terminal
 Après l'installation, vérifiez les dossiers créés :
 
 ```bash
-# Dossier config ART
+# Dossier de configuration
 ls -la ~/.config/ART/usercommands/select-editor.txt
 
-# Dossier application
-ls -la ~/Programmes/ARTcompagnon/
-
-# Dossier custom-tasks
-ls -la ~/Programmes/ARTcompagnon/custom-tasks/
+# Dossiers des scripts (créés automatiquement au 1er lancement)
+ls -la ~/.config/ART/usercommands/bash/
+ls -la ~/.config/ART/usercommands/python/
+ls -la ~/.config/ART/usercommands/lua/
 ```
 
 ---
@@ -65,48 +61,55 @@ ls -la ~/Programmes/ARTcompagnon/custom-tasks/
 
 1. Lancez **ART**
 2. Ouvrez une image RAW
-3. Cliquez sur **"External Editor"** dans le menu
+3. Cliquez sur **"External Editor"** dans le menu (ou Ctrl+E)
 4. **Le ARTherapee Compagnon** s'ouvre ! 🎉
 
 ---
 
 ## 📝 Ajouter vos scripts personnalisés
 
-### Méthode 1 : Depuis l'interface
-
+### Méthode 1 : Depuis l'interface (recommandée)
 1. Ouvrez ARTcompagnon
-2. Allez dans l'onglet **"🔧 Scripts ART"**
-3. Cliquez sur **"📥 Charger un script"**
-4. Sélectionnez votre fichier `.sh`
+2. Cliquez sur **"📥 Charger un script"**
+3. Sélectionnez votre fichier (`.sh`, `.py`, `.lua`)
+4. ✅ Le script est automatiquement copié au bon endroit!
 
 ### Méthode 2 : Copier manuellement
 
+**Scripts Bash :**
 ```bash
-cp mon-script.sh ~/Programmes/ARTcompagnon/custom-tasks/
-chmod +x ~/Programmes/ARTcompagnon/custom-tasks/mon-script.sh
+cp mon-script.sh ~/.config/ART/usercommands/bash/
+chmod +x ~/.config/ART/usercommands/bash/mon-script.sh
+```
+
+**Scripts Python :**
+```bash
+cp mon-script.py ~/.config/ART/usercommands/python/
+chmod +x ~/.config/ART/usercommands/python/mon-script.py
+```
+
+**Scripts Lua :**
+```bash
+cp mon-script.lua ~/.config/ART/usercommands/lua/
 ```
 
 ---
 
-## 📋 Exemple de script personnalisé
+## 📋 Exemple de script Bash
 
-Créez `~/Programmes/ARTcompagnon/custom-tasks/traiter-image.sh` :
+Créez `~/.config/ART/usercommands/bash/exemple.sh` :
 
 ```bash
 #!/bin/bash
 # Script exemple : traiter une image
-
 IMAGE="$1"
-
 echo "Traitement de : $IMAGE"
-echo "Conversion en sRGB..."
-convert "$IMAGE" -colorspace sRGB "${IMAGE%.tif}_sRGB.tif"
 echo "✅ Terminé!"
 ```
 
 Rendez-le exécutable :
 ```bash
-chmod +x ~/Programmes/ARTcompagnon/custom-tasks/traiter-image.sh
+chmod +x ~/.config/ART/usercommands/bash/exemple.sh
 ```
 
 ---
@@ -133,7 +136,7 @@ Le fichier `select-editor-config.json` contient vos éditeurs préférés :
 ```
 
 Vous pouvez :
-- ➕ **Ajouter** des éditeurs via l'interface (onglet "➕ Gérer")
+- ➕ **Ajouter** des éditeurs via l'interface (onglet "Éditeurs")
 - ➖ **Supprimer** des éditeurs via l'interface
 
 ---
@@ -146,16 +149,17 @@ Vous pouvez :
 python3 -c "import PyQt5; print('PyQt5 OK')"
 
 # Vérifiez les droits
-chmod +x ~/Programmes/ARTcompagnon/select-editor.py
+chmod +x ~/art-compagnon/select-editor.py
 ```
 
 ### Les scripts ne s'exécutent pas
 ```bash
-# Vérifiez les droits
-chmod +x ~/Programmes/ARTcompagnon/custom-tasks/*.sh
+# Vérifiez les droits (Bash et Python)
+chmod +x ~/.config/ART/usercommands/bash/*.sh
+chmod +x ~/.config/ART/usercommands/python/*.py
 
-# Vérifiez les chemins dans le script
-head -1 ~/Programmes/ARTcompagnon/custom-tasks/mon-script.sh
+# Vérifiez le shebang (Bash)
+head -1 ~/.config/ART/usercommands/bash/mon-script.sh
 # Doit commencer par: #!/bin/bash
 ```
 
@@ -174,7 +178,7 @@ ART &
 ## 📞 Support
 
 - Problèmes ? Ouvrez une issue sur GitHub
-- Questions ? Consultez la documentation ART : https://artherapee.fr/
+- Questions ? Consultez la documentation ART : https://github.com/agriggio/art
 
 ---
 

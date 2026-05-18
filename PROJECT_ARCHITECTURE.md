@@ -28,7 +28,6 @@
 ├── .git/                           ← Contrôle de version
 ├── select-editor.py                ← App principale Qt/Python
 ├── select-editor-config.json       ← Config des éditeurs
-├── custom-tasks/                   ← Scripts bash pour AC
 │   ├── ctl-launcher.sh            ← Lance les scripts CTL
 │   ├── smart_masking.sh           ← Lance SMART
 │   └── lightzone-wrapper.sh       ← Wrapper LightZone
@@ -132,7 +131,6 @@ Config ART:         ~/.config/ART/
   - SMART config:   ~/.config/ART/SMART.json
 
 AC repo:            ~/art-compagnon/ ← CELUI-CI!
-custom-tasks:       ~/art-compagnon/custom-tasks/
 ```
 
 ---

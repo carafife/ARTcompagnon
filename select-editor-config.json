@@ -9,6 +9,11 @@
       "name": "RawTherapee",
       "description": "Raw Image Processor",
       "command": "rawtherapee"
+    },
+    {
+      "name": "Luminance-hdr",
+      "description": "HDR",
+      "command": "/usr/bin/luminance-hdr"
     }
   ]
 }
