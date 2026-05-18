@@ -499,44 +499,59 @@ class ARTCompanion(QDialog):
 
     def install_pack_from_github(self):
         """Télécharger et installer un pack depuis GitHub ARTcompagnon-Scripts"""
-        try:
-            import json as json_module
-            
-            # URL du dernier release
-            release_url = "https://api.github.com/repos/carafife/ARTcompagnon-Scripts/releases/latest"
-            
-            # Télécharger les infos du release
-            with urllib.request.urlopen(release_url) as response:
-                release_data = json_module.loads(response.read().decode())
-            
-            # Trouver l'asset pack-basic.zip
-            assets = release_data.get('assets', [])
-            pack_url = None
-            for asset in assets:
-                if asset['name'] == 'pack-basic.zip':
-                    pack_url = asset['browser_download_url']
-                    break
-            
-            if not pack_url:
-                QMessageBox.warning(self, "Erreur", "Pack pack-basic.zip non trouvé dans les releases!")
-                return
-            
-            # Télécharger le pack
-            temp_dir = tempfile.mkdtemp()
-            pack_path = os.path.join(temp_dir, 'pack-basic.zip')
-            
-            urllib.request.urlretrieve(pack_url, pack_path)
-            
-            # Lancer le script d'installation
-            install_script = os.path.expanduser("~/Programmes/ARTcompagnon-Scripts/install-scripts/install-pack.sh")
-            subprocess.run(['bash', install_script, pack_path], check=True)
-            
-            # Rafraîchir la liste
-            self.refresh_scripts_list()
-            QMessageBox.information(self, "Succès", "✅ Pack installé avec succès!")
-            
-        except Exception as e:
-            QMessageBox.critical(self, "Erreur", f"❌ Erreur lors de l'installation: {str(e)}")
+        def download_and_install():
+            try:
+                import json as json_module
+                
+                # URL du dernier release
+                release_url = "https://api.github.com/repos/carafife/ARTcompagnon-Scripts/releases/latest"
+                
+                # Télécharger les infos du release
+                with urllib.request.urlopen(release_url, timeout=10) as response:
+                    release_data = json_module.loads(response.read().decode())
+                
+                # Trouver l'asset pack-basic.zip
+                assets = release_data.get('assets', [])
+                pack_url = None
+                for asset in assets:
+                    if asset['name'] == 'pack-basic.zip':
+                        pack_url = asset['browser_download_url']
+                        break
+                
+                if not pack_url:
+                    QMessageBox.warning(self, "Erreur", "Pack pack-basic.zip non trouvé dans les releases!")
+                    return
+                
+                # Télécharger le pack
+                temp_dir = tempfile.mkdtemp()
+                pack_path = os.path.join(temp_dir, 'pack-basic.zip')
+                
+                urllib.request.urlretrieve(pack_url, pack_path)
+                
+                # Lancer le script d'installation
+                install_script = os.path.expanduser("~/Programmes/ARTcompagnon-Scripts/install-scripts/install-pack.sh")
+                result = subprocess.run(['bash', install_script, pack_path], capture_output=True, text=True)
+                
+                # Nettoyer
+                import shutil
+                shutil.rmtree(temp_dir, ignore_errors=True)
+                
+                if result.returncode == 0:
+                    # Rafraîchir la liste
+                    self.refresh_scripts_list()
+                    QMessageBox.information(self, "Succès", "✅ Pack installé avec succès!")
+                else:
+                    QMessageBox.critical(self, "Erreur", f"❌ Erreur lors de l'installation:\n{result.stderr}")
+                
+            except Exception as e:
+                QMessageBox.critical(self, "Erreur", f"❌ Erreur lors de l'installation: {str(e)}")
+        
+        # Lancer le téléchargement dans un thread séparé
+        thread = threading.Thread(target=download_and_install, daemon=True)
+        thread.start()
+        
+        # Afficher un message pendant le téléchargement
+        QMessageBox.information(self, "Info", "⏳ Téléchargement et installation en cours...\nCela peut prendre quelques secondes.")
 
     def apply_theme(self):
         dark_stylesheet = """QDialog, QWidget { background-color: #1a1a1a; color: #e8e8e8; } QLabel { color: #e8e8e8; } QListWidget, QLineEdit, QComboBox, QTextEdit { background-color: #252525; border: 1px solid #3a3a3a; color: #e8e8e8; border-radius: 4px; padding: 5px; } QListWidget::item { padding: 8px; border-radius: 4px; } QListWidget::item:selected { background-color: #c97d3a; color: #ffffff; } QListWidget::item:hover { background-color: #2f2f2f; } QPushButton { background-color: #c97d3a; color: #ffffff; border: none; border-radius: 4px; font-weight: bold; font-size: 10px; padding: 3px; font-family: Sans; } QPushButton:hover { background-color: #d9945a; } QPushButton:pressed { background-color: #b96b2a; } QTabWidget::pane { border: 1px solid #3a3a3a; } QTabBar::tab { background-color: #252525; color: #e8e8e8; padding: 5px 15px; border: 1px solid #3a3a3a; } QTabBar::tab:selected { background-color: #c97d3a; color: #ffffff; }"""
