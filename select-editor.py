@@ -349,60 +349,6 @@ class ARTCompanion(QDialog):
             self.update_remove_combo()
             QMessageBox.information(self, "Succès", "Éditeur supprimé!")
     
-    def load_script(self):
-        file_dialog = QFileDialog()
-        file_path, _ = file_dialog.getOpenFileName(self, "Sélectionner un script", os.path.expanduser("~"), "Scripts (*.sh *.py *.lua *.txt);;Tous les fichiers (*)")
-        if file_path:
-            filename = os.path.basename(file_path)
-            
-            # Détecter le type et le dossier destination
-            if filename.endswith('.sh'):
-                dest_folder = 'bash'
-            elif filename.endswith('.py'):
-                dest_folder = 'python'
-            elif filename.endswith('.lua'):
-                dest_folder = 'lua'
-            else:
-                dest_folder = 'bash'  # défaut
-            
-            dest_dir = os.path.join(self.scripts_dir, dest_folder)
-            os.makedirs(dest_dir, exist_ok=True)
-            dest_path = os.path.join(dest_dir, filename)
-            
-            try:
-                shutil.copy2(file_path, dest_path)
-                os.chmod(dest_path, 0o755)
-                self.refresh_scripts_list()
-                QMessageBox.information(self, "Succès", f"Script '{filename}' importé dans {dest_folder}/!")
-            except Exception as e:
-                QMessageBox.critical(self, "Erreur", f"Impossible d'importer le script: {e}")
-    
-    def refresh_scripts_list(self):
-        self.scripts_tree.clear()
-        if not os.path.exists(self.scripts_dir):
-            os.makedirs(self.scripts_dir, exist_ok=True)
-        
-        folders = {'bash': '🔧', 'python': '🐍', 'lua': '🌙'}
-        found = False
-        
-        for folder_name, icon in folders.items():
-            folder_path = os.path.join(self.scripts_dir, folder_name)
-            if os.path.isdir(folder_path):
-                scripts = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
-                if scripts:
-                    folder_item = QTreeWidgetItem([f'{icon} {folder_name.upper()}'])
-                    self.scripts_tree.addTopLevelItem(folder_item)
-                    found = True
-                    for script in sorted(scripts):
-                        child = QTreeWidgetItem([script])
-                        child.setData(0, Qt.UserRole, os.path.join(folder_name, script))
-                        folder_item.addChild(child)
-                    folder_item.setExpanded(True)
-        
-        if not found:
-            empty = QTreeWidgetItem(['📭 Aucun script trouvé'])
-            self.scripts_tree.addTopLevelItem(empty)
-    
     def execute_selected_script(self):
         item = self.scripts_tree.currentItem()
         if not item or item.text(0) == '📭 Aucun script trouvé':
@@ -445,6 +391,100 @@ class ARTCompanion(QDialog):
             except Exception as e:
                 QMessageBox.critical(self, "Erreur", f"Impossible de supprimer: {e}")
     
+    def load_script(self):
+        file_dialog = QFileDialog()
+        file_path, _ = file_dialog.getOpenFileName(self, "Sélectionner un script", os.path.expanduser("~"), "Scripts (*.sh *.py *.lua *.txt);;Tous les fichiers (*)")
+        if file_path:
+            filename = os.path.basename(file_path)
+            
+            # Détecter le type
+            if filename.endswith('.sh'):
+                dest_folder = 'bash'
+            elif filename.endswith('.py'):
+                dest_folder = 'python'
+            elif filename.endswith('.lua'):
+                dest_folder = 'lua'
+            else:
+                dest_folder = 'bash'
+            
+            # Demander la catégorie (photo ou utilitaire)
+            msg = QMessageBox()
+            msg.setWindowTitle("Choisir la catégorie")
+            msg.setText(f"Où placer ce script {dest_folder}?")
+            msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+            
+            btn_photo = msg.addButton("📷 photo", QMessageBox.AcceptRole)
+            btn_utilitaire = msg.addButton("🛠️ utilitaire", QMessageBox.RejectRole)
+            msg.setDefaultButton(btn_photo)
+            
+            msg.exec_()
+            
+            if msg.clickedButton() == btn_photo:
+                subcategory = 'photo'
+            elif msg.clickedButton() == btn_utilitaire:
+                subcategory = 'utilitaire'
+            else:
+                return
+            
+            # Créer les dossiers s'ils n'existent pas
+            dest_dir = os.path.join(self.scripts_dir, dest_folder, subcategory)
+            os.makedirs(dest_dir, exist_ok=True)
+            dest_path = os.path.join(dest_dir, filename)
+            
+            try:
+                shutil.copy2(file_path, dest_path)
+                os.chmod(dest_path, 0o755)
+                self.refresh_scripts_list()
+                QMessageBox.information(self, "Succès", f"Script '{filename}' importé dans {dest_folder}/{subcategory}/!")
+            except Exception as e:
+                QMessageBox.critical(self, "Erreur", f"Impossible d'importer le script: {e}")
+
+    def refresh_scripts_list(self):
+        self.scripts_tree.clear()
+        if not os.path.exists(self.scripts_dir):
+            os.makedirs(self.scripts_dir, exist_ok=True)
+        
+        folders = {'bash': '🔧', 'python': '🐍', 'lua': '🌙'}
+        subfolder_icons = {'photo': '📷', 'utilitaire': '🛠️'}
+        found = False
+        
+        for folder_name, icon in folders.items():
+            folder_path = os.path.join(self.scripts_dir, folder_name)
+            if os.path.isdir(folder_path):
+                folder_item = QTreeWidgetItem([f'{icon} {folder_name.upper()}'])
+                
+                has_content = False
+                for subfolder_name in ['photo', 'utilitaire']:
+                    subfolder_path = os.path.join(folder_path, subfolder_name)
+                    if os.path.isdir(subfolder_path):
+                        scripts = [f for f in os.listdir(subfolder_path) if os.path.isfile(os.path.join(subfolder_path, f))]
+                        if scripts:
+                            subfolder_item = QTreeWidgetItem([f'{subfolder_icons.get(subfolder_name, "📁")} {subfolder_name.capitalize()}'])
+                            folder_item.addChild(subfolder_item)
+                            has_content = True
+                            for script in sorted(scripts):
+                                child = QTreeWidgetItem([script])
+                                child.setData(0, Qt.UserRole, os.path.join(folder_name, subfolder_name, script))
+                                subfolder_item.addChild(child)
+                            subfolder_item.setExpanded(True)
+                
+                scripts = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
+                if scripts:
+                    for script in sorted(scripts):
+                        child = QTreeWidgetItem([script])
+                        child.setData(0, Qt.UserRole, os.path.join(folder_name, script))
+                        folder_item.addChild(child)
+                    has_content = True
+                
+                if has_content:
+                    self.scripts_tree.addTopLevelItem(folder_item)
+                    folder_item.setExpanded(True)
+                    found = True
+        
+        if not found:
+            empty = QTreeWidgetItem(['📭 Aucun script trouvé'])
+            self.scripts_tree.addTopLevelItem(empty)
+
     def configure_cache_folder(self):
         """Ouvre un dialogue pour configurer le dossier cache"""
         cache_folder = QFileDialog.getExistingDirectory(
