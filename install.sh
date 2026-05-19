@@ -54,6 +54,26 @@ echo "✅ Dossier créé"
 echo ""
 
 # ============================================
+# ============================================
+# ÉTAPE 3bis : Créer dossier ARTcompagnon config
+# ============================================
+echo "📁 Création du dossier de config ARTcompagnon..."
+mkdir -p ~/.config/ARTcompagnon
+echo "✅ Dossier créé"
+echo ""
+# ============================================
+# ÉTAPE 4bis : Générer le fichier de config ARTcompagnon
+# ============================================
+echo "⚙️  Génération d'artcompagnon-config.json..."
+cat > ~/.config/ARTcompagnon/artcompagnon-config.json << EOFCONFIG
+{
+  "theme": "defaut"
+}
+EOFCONFIG
+echo "✅ Fichier généré :"
+echo "   ~/.config/ARTcompagnon/artcompagnon-config.json"
+echo ""
+
 # ÉTAPE 4 : Générer le fichier de config
 # ============================================
 echo "⚙️  Génération de select-editor.txt..."
