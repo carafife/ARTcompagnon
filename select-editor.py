@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (QApplication, QDialog, QVBoxLayout, QHBoxLayout, QL
                               QLineEdit, QComboBox, QMessageBox, QFileDialog, QTextEdit)
 from PyQt5.QtCore import Qt, QSize, pyqtSignal, QObject
 from PyQt5.QtGui import QFont, QPixmap, QTextCursor
+from themes_data import THEMES
 
 class OutputEmitter(QObject):
     output_signal = pyqtSignal(str)
@@ -163,6 +164,12 @@ class ARTCompanion(QDialog):
     def create_editors_tab(self):
         widget = QWidget()
         layout = QVBoxLayout()
+        # Thème
+        self.theme_combo = QComboBox()
+        self.theme_combo.addItems(list(THEMES.keys()))
+        self.theme_combo.currentTextChanged.connect(self.on_theme_changed)
+        layout.addWidget(self.theme_combo)
+        
         self.editors_list = QListWidget()
         self.update_editors_list()
         self.editors_list.itemDoubleClicked.connect(self.launch_selected_editor)
@@ -308,6 +315,9 @@ class ARTCompanion(QDialog):
         for editor in self.config['editors']:
             self.remove_combo.addItem(editor['name'], editor)
     
+    def on_theme_changed(self, theme_name):
+        self.setStyleSheet(THEMES[theme_name])
+
     def launch_selected_editor(self):
         item = self.editors_list.currentItem()
         if item:
