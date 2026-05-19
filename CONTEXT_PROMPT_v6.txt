@@ -1,0 +1,28 @@
+================================================================================
+CONTEXT_PROMPT_v6.txt
+ARTcompagnon Development Session — May 19, 2026
+State complete after smart_masking.sh debugging
+================================================================================
+
+## SESSION SUMMARY
+
+✅ FIXED: smart_masking.sh now works!
+- Detects RAW → exports to JPEG (better quality) → opens SMART GUI
+- Detects JPEG/TIF → opens directly in SMART GUI
+- Waits for SMART GUI to close before terminating (fixed original bug!)
+
+✅ CONFIGURED: smart_masking.txt path corrected
+- Was: Command=./smart_masking.sh (WRONG)
+- Now: Command=./bash/smart_masking.sh (CORRECT)
+
+✅ WORKS VIA:
+- ARTcompagnon (right-click image → ARTcompagnon → Smart Masking)
+- ART usercommand direct (right-click image → AI masking (SMART))
+
+## NEXT STEPS (TOMORROW)
+
+❌ Test nind_denoise_raw.sh
+❌ Fix ctl-launcher.sh (not working)
+⏳ Commit and push to GitHub test branch
+
+================================================================================

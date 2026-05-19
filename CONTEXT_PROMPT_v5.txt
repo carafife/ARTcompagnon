@@ -1,0 +1,26 @@
+=== ÉTAT RÉEL D'ARTcompagnon - 19 mai 2026 ===
+
+VERSIONS:
+- main (GitHub) = v1.5 STABLE
+- test (GitHub) = v1.5.5-beta (commit 77645d7) - DERNIERS CHANGEMENTS AUJOURD'HUI
+
+ARBORESCENCE AFFICHÉE (select-editor.py):
+✅ 🚀 Synde Noise (nind_denoise_raw.sh)
+✅ 🤖 Smart Masking (smart_masking.sh) - CONFIGURÉ mais NE MARCHE PAS
+✅ 🎨 CT Launcher (ctl-launcher.sh) - NE MARCHE PAS
+✅ 🔧 BASH → 🛠️ Utilitaire → cherche_appli.sh
+✅ 🐍 PYTHON → 🛠️ Utilitaire → devine_age_loop.py
+✅ 🌙 LUA → 🛠️ Utilitaire → essai.lua
+
+PROBLÈME:
+- smart_masking.sh et ctl-launcher.sh: scripts legacy avec chemins codés en dur
+- Config SMART.json créée ✅ mais script ne fonctionne pas
+- ctl-launcher.sh: cause inconnue
+- NE SONT PAS DANS LE GUIDE ARTcompagnon
+
+DÉCISION À PRENDRE:
+[ ] Garder smart_masking.sh et ctl-launcher.sh dans ARTcompagnon (nécessite FIX)
+[ ] Les retirer d'ARTcompagnon (outils externes)
+
+STATUS GITHUB:
+- NE PAS POUSSER tant qu'on n'a pas décidé
