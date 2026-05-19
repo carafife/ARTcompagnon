@@ -107,13 +107,13 @@ class ARTCompanion(QDialog):
         main_layout.setSpacing(12)
         
         header_layout = QHBoxLayout()
-        header_layout.addStretch()
         
         logo_label = QLabel()
         if os.path.exists(self.logo_path):
-            pixmap = QPixmap(self.logo_path).scaledToWidth(56, Qt.SmoothTransformation)
+            pixmap = QPixmap(self.logo_path).scaledToWidth(80, Qt.SmoothTransformation)
             logo_label.setPixmap(pixmap)
         header_layout.addWidget(logo_label)
+        header_layout.addStretch()
         
         title_section = QVBoxLayout()
         title_section.setSpacing(3)
