@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sys, json, subprocess, os, shutil, threading, urllib.request, zipfile, tempfile
+import sys, json, subprocess, os, shutil, threading, urllib.request, zipfile, tempfile, time
 from PyQt5.QtWidgets import (QApplication, QDialog, QVBoxLayout, QHBoxLayout, QListWidget, QTreeWidget, QTreeWidgetItem, 
                               QListWidgetItem, QPushButton, QLabel, QTabWidget, QWidget, 
                               QLineEdit, QComboBox, QMessageBox, QFileDialog, QTextEdit)
@@ -39,6 +39,94 @@ def apply_theme_to_app(parent_widget, theme_name):
     if theme_name in THEMES:
         stylesheet = THEMES[theme_name]
         parent_widget.setStyleSheet(stylesheet)
+
+# ============================================
+# Splash Screen
+# ============================================
+class SplashScreen(QDialog):
+    def __init__(self, logo_path):
+        super().__init__()
+        self.logo_path = logo_path
+        self.init_ui()
+        self.center_window()
+        self.fade_in()
+    
+    def init_ui(self):
+        self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
+        self.setGeometry(0, 0, 800, 500)
+        self.setStyleSheet("background-color: #454545; border-radius: 10px;")
+        
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        
+        # Logo
+        logo_container = QWidget()
+        logo_layout = QVBoxLayout()
+        logo_layout.setContentsMargins(0, 30, 0, 20)
+        logo_label = QLabel()
+        if os.path.exists(self.logo_path):
+            pixmap = QPixmap(self.logo_path).scaledToWidth(380, Qt.SmoothTransformation)
+            logo_label.setPixmap(pixmap)
+        logo_label.setAlignment(Qt.AlignCenter)
+        logo_layout.addWidget(logo_label)
+        logo_container.setLayout(logo_layout)
+        layout.addWidget(logo_container)
+        
+        # Texte - sera animé
+        self.text_label = QLabel("Powered by Carafife")
+        text_font = QFont("Sans", 14)
+        text_font.setBold(True)
+        self.text_label.setFont(text_font)
+        self.text_label.setStyleSheet("color: #C97D3A; background-color: transparent;")
+        self.text_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.text_label)
+        
+        layout.addStretch()
+        self.setLayout(layout)
+    
+    def center_window(self):
+        """Centre la splash au centre de l'écran"""
+        screen_geometry = QApplication.desktop().screenGeometry()
+        window_geometry = self.frameGeometry()
+        center_x = (screen_geometry.width() - window_geometry.width()) // 2
+        center_y = (screen_geometry.height() - window_geometry.height()) // 2
+        self.move(center_x, max(0, center_y))
+    
+    def fade_in(self):
+        """Animation fade in rapide du logo, puis du texte avec effet zoom"""
+        self.setWindowOpacity(0)
+        self.show()
+        
+        # Fade in du splash - RAPIDE (6 étapes au lieu de 11)
+        for i in range(0, 6):
+            self.setWindowOpacity(i / 5.0)
+            QApplication.processEvents()
+            threading.Event().wait(0.03)
+        
+        # Animation du texte: zoom in/out (pulse) centré - PLUS LONG (10 étapes)
+        for i in range(0, 10):
+            if i <= 5:
+                size = 8 + (i / 5.0) * 16
+            else:
+                size = 24 - ((i - 5) / 5.0) * 10
+            
+            text_font = QFont("Sans", int(size))
+            text_font.setBold(True)
+            self.text_label.setFont(text_font)
+            QApplication.processEvents()
+            threading.Event().wait(0.07)
+        
+        # Pause réduite à 0.3s
+        time.sleep(0.3)
+    
+    def fade_out(self):
+        """Animation fade out RAPIDE"""
+        for i in range(5, -1, -1):
+            self.setWindowOpacity(i / 5.0)
+            QApplication.processEvents()
+            threading.Event().wait(0.02)
+        self.close()
 
 class OutputEmitter(QObject):
     output_signal = pyqtSignal(str)
@@ -107,6 +195,7 @@ class ARTCompanion(QDialog):
             os.makedirs(folder_path, exist_ok=True)
         self.load_config()
         self.init_ui()
+        self.center_window()
         current_theme = load_theme_config()
         apply_theme_to_app(self, current_theme)
     
@@ -131,6 +220,14 @@ class ARTCompanion(QDialog):
     def save_config(self):
         with open(self.config_file, 'w') as f:
             json.dump(self.config, f, indent=2)
+    
+    def center_window(self):
+        """Centre la fenêtre au centre de l'écran"""
+        screen_geometry = QApplication.desktop().screenGeometry()
+        window_geometry = self.frameGeometry()
+        center_x = (screen_geometry.width() - window_geometry.width()) // 2
+        center_y = (screen_geometry.height() - window_geometry.height()) // 2
+        self.move(center_x, max(0, center_y))
     
     def init_ui(self):
         self.setWindowTitle("Le ARTherapee Compagnon 🇫🇷 v1.5.4-beta")
@@ -658,10 +755,32 @@ if __name__ == "__main__":
         print(f"Config not found: {config}")
         sys.exit(1)
     app = QApplication(sys.argv)
-    companion = ARTCompanion(config, sys.argv[1:], logo)
-    # Appliquer le thème une 2e fois pour le startup
-    current_theme = load_theme_config()
-    apply_theme_to_app(companion, current_theme)
+    
+    # Afficher le splash screen IMMÉDIATEMENT
+    splash = SplashScreen(logo)
+    
+    # Forcer le rendu du splash tout de suite
     app.processEvents()
+    app.processEvents()
+    
+    # ⏱️ Mesurer le temps de création d'ARTcompagnon
+    import time as time_module
+    start_time = time_module.time()
+    
+    # Créer ARTcompagnon
+    companion = ARTCompanion(config, sys.argv[1:], logo)
+    
+    end_time = time_module.time()
+    load_time = end_time - start_time
+    
+    print(f"⏱️  ARTcompagnon chargé en {load_time:.2f}s")
+    
+    # Attendre minimum 0.8s (timing parfait)
+    time.sleep(max(0.8, load_time * 0.8))
+    
+    # Fade out du splash RAPIDE
+    splash.fade_out()
+    
+    # Afficher ARTcompagnon IMMÉDIATEMENT
     companion.show()
     companion.exec_()
