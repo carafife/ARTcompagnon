@@ -10,7 +10,7 @@ QTabBar::tab { background-color: #3A3A3A; color: #D8D8D8; border: 2px solid #C97
 QTabBar::tab:selected { background-color: #454545; color: #FFFFFF; border: 2px solid #D9945A; }
 QTabBar::tab:hover { background-color: #505050; border: 2px solid #D9945A; }''',
 
-    'clair': '''QDialog, QWidget { background-color: #787878; color: #DCDCDC; }
+    'average': '''QDialog, QWidget { background-color: #787878; color: #DCDCDC; }
 QLabel { color: #DCDCDC; }
 QListWidget, QLineEdit, QComboBox, QTextEdit { background-color: #878787; border: 1px solid #6E6E6E; color: #DCDCDC; border-radius: 4px; padding: 5px; }
 QListWidget::item:selected { background-color: #6E6E6E; color: #FFFFFF; }

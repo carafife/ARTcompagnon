@@ -8,6 +8,55 @@ from PyQt5.QtGui import QFont, QPixmap, QTextCursor
 from themes_data import THEMES
 
 # ============================================
+# Gestion des traductions
+# ============================================
+TRANSLATIONS = {}
+
+def load_translations():
+    """Charge les traductions depuis translations.json"""
+    global TRANSLATIONS
+    config_path = os.path.join(os.path.dirname(__file__), "translations.json")
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            TRANSLATIONS = json.load(f)
+    except:
+        print("⚠️  Erreur chargement translations.json")
+        TRANSLATIONS = {"fr": {}, "en": {}}
+
+def get_text(key, lang="fr"):
+    """Retourne le texte traduit pour une clé"""
+    if not TRANSLATIONS:
+        load_translations()
+    return TRANSLATIONS.get(lang, {}).get(key, key)
+
+def load_language_config():
+    """Charge la langue sauvegardée"""
+    config_path = os.path.expanduser("~/.config/ARTcompagnon/artcompagnon-config.json")
+    try:
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+            return config.get('language', 'fr')
+    except:
+        return 'fr'
+
+def save_language_config(language):
+    """Sauvegarde la langue choisie"""
+    config_path = os.path.expanduser("~/.config/ARTcompagnon/artcompagnon-config.json")
+    try:
+        config = {}
+        if os.path.exists(config_path):
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+        config['language'] = language
+        with open(config_path, 'w') as f:
+            json.dump(config, f, indent=2)
+    except:
+        pass
+
+# Charger les traductions au démarrage
+load_translations()
+
+# ============================================
 # Gestion des thèmes
 # ============================================
 def load_theme_config():
@@ -189,6 +238,10 @@ class ARTCompanion(QDialog):
         self.logo_path = logo_path
         self.scripts_dir = os.path.expanduser("~/.config/ART/usercommands")
         
+        # Langue et thème
+        self.current_language = load_language_config()
+        self.current_theme = load_theme_config()
+        
         # Créer les dossiers de scripts s'ils n'existent pas
         for folder in ['bash', 'python', 'lua']:
             folder_path = os.path.join(self.scripts_dir, folder)
@@ -196,8 +249,10 @@ class ARTCompanion(QDialog):
         self.load_config()
         self.init_ui()
         self.center_window()
-        current_theme = load_theme_config()
-        apply_theme_to_app(self, current_theme)
+        apply_theme_to_app(self, self.current_theme)
+        # Initialiser langue au démarrage SEULEMENT si pas français (ui créée en fr par défaut)
+        if self.current_language != 'fr':
+            self.update_ui_language()
     
     def find_terminal(self):
         """Trouve un terminal disponible"""
@@ -295,15 +350,43 @@ class ARTCompanion(QDialog):
     def create_editors_tab(self):
         widget = QWidget()
         layout = QVBoxLayout()
+        
+        # Thème et Langue - côte à côte, petits
+        settings_layout = QHBoxLayout()
+        settings_layout.setSpacing(10)
+        
         # Thème
+        theme_label = QLabel(get_text('theme_label', self.current_language))
+        theme_label.setMaximumWidth(50)
         self.theme_combo = QComboBox()
-        self.theme_combo.addItems(list(THEMES.keys()))
-        # Charger le thème sauvegardé et définir l'index
+        self.theme_combo.setMaximumWidth(120)
+        # Affiche les noms traduits, stocke les clés en UserRole
+        self.theme_keys = list(THEMES.keys())
+        for key in self.theme_keys:
+            self.theme_combo.addItem(get_text(f'theme_{key}', self.current_language), key)
         current_theme = load_theme_config()
-        theme_index = list(THEMES.keys()).index(current_theme) if current_theme in THEMES else 0
-        self.theme_combo.setCurrentIndex(theme_index)
-        self.theme_combo.currentTextChanged.connect(self.on_theme_changed)
-        layout.addWidget(self.theme_combo)
+        if current_theme in self.theme_keys:
+            theme_index = self.theme_keys.index(current_theme)
+            self.theme_combo.setCurrentIndex(theme_index)
+        self.theme_combo.currentIndexChanged.connect(self.on_theme_changed)
+        
+        # Langue
+        language_label = QLabel(get_text('language_label', self.current_language))
+        language_label.setMaximumWidth(60)
+        self.language_combo = QComboBox()
+        self.language_combo.setMaximumWidth(100)
+        self.language_combo.addItems(['Français', 'English'])
+        lang_index = 1 if self.current_language == 'en' else 0
+        self.language_combo.setCurrentIndex(lang_index)
+        self.language_combo.currentIndexChanged.connect(self.on_language_changed)
+        
+        settings_layout.addWidget(theme_label)
+        settings_layout.addWidget(self.theme_combo)
+        settings_layout.addWidget(language_label)
+        settings_layout.addWidget(self.language_combo)
+        settings_layout.addStretch()
+        
+        layout.addLayout(settings_layout)
         
         self.editors_list = QListWidget()
         self.update_editors_list()
@@ -450,9 +533,117 @@ class ARTCompanion(QDialog):
         for editor in self.config['editors']:
             self.remove_combo.addItem(editor['name'], editor)
     
-    def on_theme_changed(self, theme_name):
-        apply_theme_to_app(self, theme_name)
-        save_theme_config(theme_name)
+    def on_theme_changed(self, index):
+        # Récupère la clé du thème stockée en UserRole
+        theme_key = self.theme_combo.currentData()
+        if theme_key:
+            apply_theme_to_app(self, theme_key)
+            save_theme_config(theme_key)
+    
+    def on_language_changed(self, index):
+        """Change la langue et met à jour l'interface"""
+        lang = 'en' if index == 1 else 'fr'
+        self.current_language = lang
+        save_language_config(lang)
+        self.update_ui_language()
+    
+    def update_ui_language(self):
+        """Met à jour TOUS les textes de l'UI selon la langue"""
+        lang = self.current_language
+        
+        # Fenêtre
+        self.setWindowTitle(get_text('window_title', lang))
+        
+        # Tabs
+        tabs = self.findChild(QTabWidget)
+        if tabs:
+            tabs.setTabText(0, get_text('tab_editors', lang))
+            tabs.setTabText(1, get_text('tab_manage', lang))
+            tabs.setTabText(2, get_text('tab_scripts', lang))
+        
+        # Mettre à jour les noms des thèmes dans le combobox
+        if hasattr(self, 'theme_combo') and hasattr(self, 'theme_keys'):
+            current_key = self.theme_combo.currentData()
+            self.theme_combo.clear()
+            for key in self.theme_keys:
+                self.theme_combo.addItem(get_text(f'theme_{key}', lang), key)
+            # Restaure le thème sélectionné
+            if current_key and current_key in self.theme_keys:
+                idx = self.theme_keys.index(current_key)
+                self.theme_combo.setCurrentIndex(idx)
+        
+        # Traduire TOUS les QLabel
+        label_mapping = {
+            'Thème:': 'theme_label',
+            'Theme:': 'theme_label',
+            'Langue:': 'language_label',
+            'Language:': 'language_label',
+            'Éditeurs disponibles:': 'available_editors',
+            'Available editors:': 'available_editors',
+            'Scripts disponibles:': 'available_scripts',
+            'Available scripts:': 'available_scripts',
+            'Ajouter un nouvel éditeur:': 'add_editor_section',
+            'Add a new editor:': 'add_editor_section',
+            'Nom:': 'name_label',
+            'Name:': 'name_label',
+            'Description:': 'description_label',
+            'Commande:': 'command_label',
+            'Command:': 'command_label',
+            'Supprimer un éditeur:': 'remove_editor_section',
+            'Remove an editor:': 'remove_editor_section'
+        }
+        
+        for label in self.findChildren(QLabel):
+            text = label.text()
+            if text in label_mapping:
+                label.setText(get_text(label_mapping[text], lang))
+        
+        # Traduire TOUS les QPushButton
+        button_mapping = {
+            'Ouvrir': 'open_btn',
+            'Open': 'open_btn',
+            'Fermer': 'close_btn',
+            'Close': 'close_btn',
+            '▶️ Exécuter': 'execute_btn',
+            '▶️ Execute': 'execute_btn',
+            '➖ Supprimer': 'remove_script_btn',
+            '➖ Remove': 'remove_script_btn',
+            'Ajouter': 'add_btn',
+            'Add': 'add_btn',
+            'Supprimer': 'remove_editor_btn',
+            'Remove': 'remove_editor_btn',
+            '📤 Charger un script': 'upload_script_btn',
+            '📥 Charger un script': 'upload_script_btn',
+            '📤 Upload script': 'upload_script_btn',
+            '🔄 Rafraîchir': 'refresh_scripts_btn',
+            '🔄 Refresh': 'refresh_scripts_btn',
+            '🗑️ Nettoyer cache': 'clear_cache_btn',
+            '🗑️ Clear cache': 'clear_cache_btn',
+            '📁 Config cache': 'config_cache_btn',
+            '⚙️ Config cache': 'config_cache_btn',
+            '⚙️ Configure cache': 'config_cache_btn',
+            '📦 Installer Pack': 'install_pack_btn',
+            '📦 Install Pack': 'install_pack_btn',
+            '➕ Ajouter': 'add_btn',
+            '➕ Add': 'add_btn',
+            '➖ Supprimer': 'remove_editor_btn',
+            '➖ Remove': 'remove_editor_btn'
+        }
+        
+        for button in self.findChildren(QPushButton):
+            text = button.text()
+            if text in button_mapping:
+                button.setText(get_text(button_mapping[text], lang))
+        
+        # Traduire les placeholders des QLineEdit
+        for line_edit in self.findChildren(QLineEdit):
+            placeholder = line_edit.placeholderText()
+            if placeholder in ['ex: MonEditeur', 'ex: MyEditor']:
+                line_edit.setPlaceholderText(get_text('name_placeholder', lang))
+            elif placeholder in ['ex: Mon éditeur préféré', 'ex: My favorite editor']:
+                line_edit.setPlaceholderText(get_text('desc_placeholder', lang))
+            elif placeholder in ['ex: /usr/bin/monapp', 'ex: /usr/bin/myapp']:
+                line_edit.setPlaceholderText(get_text('cmd_placeholder', lang))
 
     def launch_selected_editor(self):
         item = self.editors_list.currentItem()
