@@ -82,7 +82,8 @@ cat > ~/.config/ART/usercommands/select-editor.txt << EOF
 [ART UserCommand]
 Label=Le ARTherapee Compagnon
 Command=$SCRIPT_DIR/select-editor.py
-FileType=raw
+FileType=raw|jpg|jpeg|tif|tiff|png
+NumArgs=1
 EOF
 
 echo "✅ Fichier généré :"
