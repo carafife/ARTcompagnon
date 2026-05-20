@@ -1,4 +1,12 @@
+<div align="center">
+  <img src="assets/artcompagnon-logo.png" width="300" alt="ARTcompagnon Logo">
+</div>
+
 # 🎨 Le ARTherapee Compagnon
+
+Lanceur d'applications et de scripts pour ART (ARTherapee).
+
+**Version:** v2.0 | **Status:** Stable ✅
 
 Lanceur d'applications et de scripts pour ART (ARTherapee).
 
