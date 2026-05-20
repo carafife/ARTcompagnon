@@ -1,0 +1,152 @@
+# 🧠 CONTEXT_PROMPT_v8.txt - ARTcompagnon État Complet
+
+**Date:** 20 mai 2026 | **Status:** Phase 2 COMPLÈTE | **Dernier commit:** 0b80340
+
+---
+
+## 📊 RÉCAP CRITIQUE
+
+### ✅ COMPLÉTÉ cette session
+1. **Phase 2 - Traducteur FR/EN COMPLÈTE:**
+   - Tous les textes traduits dynamiquement (labels, boutons, placeholders)
+   - Combobox langue FR/EN sans allers-retours nécessaires
+   - Noms thèmes traduits: "Défaut" (FR) / "Default" (EN), "Average" (FR/EN)
+   - Performance optimisée (pas de traduction inutile au startup)
+
+2. **Thèmes renommés (cohérent ART):**
+   - `defaut` → garde le nom (# 454545)
+   - `clair` → `average` (# 787878)
+
+3. **Nettoyage repo:**
+   - ✅ Supprimé: SMART_NIND-DENOISE_DOCUMENTATION.md (périmé)
+   - ✅ Supprimé: Pack CTL ArTherapee/ (dossier scripts)
+   - ✅ Créé: INSTALLATION_DEPENDENCIES_FR.md (multi-distro: Fedora, Arch, Ubuntu)
+   - ✅ Créé: INSTALLATION_DEPENDENCIES_EN.md (multi-distro)
+
+4. **Bug fixes:**
+   - ✅ Fixed: select-editor.txt → Ajouté `NumArgs=1` (CRITIQUE!)
+   - ✅ Fixed: smart_masking.txt → Ajouté `FileType=jpg|jpeg|tif|tiff|png`
+   - ✅ Fixed: smart_masking.sh → Chemins mis à jour vers ~/Programmes/SMART
+   - ✅ Nettoyé: Fichier bizarre `'usr bin env python3 print.py'` supprimé
+
+---
+
+## 🔴 BUG CRITIQUE EN COURS
+
+**Usercommands ne s'affichent plus au clic droit ART!**
+
+- ARTcompagnon, SMART, nind-denoise n'apparaissent pas dans le navigateur ART
+- SMART fonctionne quand même (chemin direct)
+- Cause: Inconnue - probablement config ART
+- Tentatives faites:
+  - ✅ Ajouté `[Scripts]` section dans ~/.config/ART/options
+  - ❌ Pas de résultat
+
+**À INVESTIGUER:**
+- Comment ART charge vraiment les usercommands (.txt files?)
+- S'il y a un cache ART à nettoyer
+- Si le chemin dans options est correct
+
+---
+
+## 📁 ARCHITECTURE CRITIQUE
+
+```
+~/art-compagnon/ (REPO GITHUB - branche test)
+├── select-editor.py (APPLICATION PRINCIPALE)
+├── themes_data.py (THÈMES: defaut + average)
+├── translations.json (FR + EN complet)
+├── INSTALLATION_DEPENDENCIES_FR.md (DOCS)
+├── INSTALLATION_DEPENDENCIES_EN.md (DOCS)
+├── README.md (Mis à jour - "ART compilé uniquement")
+├── INSTALLATION.md (Mis à jour - "ART compilé uniquement")
+└── [autres fichiers]
+
+~/.config/ART/usercommands/
+├── select-editor.txt (ARTcompagnon - avec NumArgs=1 ✅)
+├── smart_masking.txt (SMART - avec FileType ✅)
+├── nind_denoise_raw.txt (nind-denoise ✅)
+├── bash/
+│   ├── smart_masking.sh (FIXED - chemins ~/Programmes/SMART)
+│   └── nind_denoise_raw.sh
+├── python/
+└── lua/
+
+~/.config/ART/options
+├── [External Editor]
+│   └── CustomEditor=/home/carafife/art-compagnon/select-editor.py
+├── [Scripts] ← AJOUTÉ (mais pas d'effet!)
+│   └── ScriptsPath=/home/carafife/.config/ART/usercommands
+└── [Color Management]
+    └── ClutsDirectory=/home/carafife/.config/ART/ctlscripts
+
+~/Programmes/
+├── SMART/
+│   ├── SMART-env/ (venv Python)
+│   ├── src/main.py ✅
+│   ├── models/ (SAM2 models) ✅
+│   └── data/ (configs) ✅
+├── nind-denoise/
+│   ├── nind-denoise-env/ (venv Python)
+│   ├── nind_denoise_raw.sh ✅
+│   └── [scripts]
+└── ART-ctlscripts/ (GitHub)
+    └── [CTL scripts]
+```
+
+---
+
+## 🔑 INFOS CLÉS
+
+### ARTcompagnon
+- **Repo:** https://github.com/carafife/ARTcompagnon.git (branche test)
+- **Local:** ~/art-compagnon/
+- **Dernier commit:** 0b80340 "✨ Phase 2: Traducteur FR/EN + thèmes..."
+- **Statut:** STABLE (sauf usercommands)
+- **Garantie:** Fonctionne SEULEMENT avec ART compilé (pas Flatpak/AppImage)
+
+### Phase 2 (COMPLÈTE)
+- ✅ Traducteur FR/EN dynamique
+- ✅ Thèmes defaut/average avec noms traduits
+- ✅ Performance optimisée
+- ✅ Pas d'allers-retours pour changements
+
+### Dépendances optionnelles
+- **SMART:** ~/Programmes/SMART/ ✅ (JPG/TIF/PNG seulement)
+- **nind-denoise:** ~/Programmes/nind-denoise/ ✅ (RAW seulement)
+- **CTL Scripts:** ~/Programmes/ART-ctlscripts/ ✅
+
+---
+
+## 🛠️ CHEMINS CORRECTS (MIS À JOUR)
+
+- `SMART_DIR=/home/carafife/Programmes/SMART` ✅
+- `PYTHON=/home/carafife/Programmes/SMART/SMART-env/bin/python` ✅
+- `nind-denoise PYTHON=/home/carafife/Programmes/nind-denoise-env/bin/python` ✅
+- `ART_CLI=ART-cli` (commande globale) ✅
+
+---
+
+## 📝 PROCHAINES ÉTAPES
+
+1. **[URGENT]** Fixer usercommands (comment ART les charge?)
+2. **[APRÈS]** Commit + Push Phase 2 complète
+3. **[APRÈS]** Merge test → main (v2.0 stable)
+4. Nouveau logo "Powered by Carafife"
+
+---
+
+## ⚠️ AVERTISSEMENTS
+
+- **NEVER toucher:** smart_masking.sh + nind_denoise_raw.sh chemins (juste créé!)
+- **ALWAYS utiliser Desktop Commander** pour fichiers config (bash ne voit pas /home/carafife/)
+- **Git workflow:** test = dev, main = stable releases
+- **Après CTL test:** repointer CLUT folder dans ART Preferences → ~/.config/ART/ctlscripts
+
+---
+
+## 🔄 PATTERN BUG OBSERVÉ
+
+À chaque session, un truc qu'on pensait fixe casse sans raison. Solution: Toujours updater ce CONTEXT_PROMPT v-X avec TOUT l'état actuel + chemins + configs + bugs connus.
+
+**C'est LA source de vérité maintenant!**

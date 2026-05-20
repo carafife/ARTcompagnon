@@ -28,6 +28,8 @@ cd ARTcompagnon
 
 Puis relancez ART et cliquez sur "External Editor" !
 
+⚠️ **Important:** ARTcompagnon fonctionne **GARANTIE avec ART compilé uniquement** (pas Flatpak/AppImage).
+
 ## 🎯 Utilisation
 
 ### Lancer un éditeur sur vos photos
@@ -63,8 +65,9 @@ ART → Sélectionnez 3 photos RAW d'expositions différentes → Clic droit →
 
 ## 📚 Documentation
 
-- [INSTALLATION.md](INSTALLATION.md) - Guide détaillé
-- [GUIDE_1.2.md](GUIDE_1.2.md) - Guide complet des scripts (bash/python/lua)
+- [INSTALLATION.md](INSTALLATION.md) - Guide d'installation d'ARTcompagnon
+- [INSTALLATION_DEPENDENCIES_FR.md](INSTALLATION_DEPENDENCIES_FR.md) - Installation SMART / nind-denoise / Scripts CTL (FR)
+- [INSTALLATION_DEPENDENCIES_EN.md](INSTALLATION_DEPENDENCIES_EN.md) - Installing SMART / nind-denoise / CTL Scripts (EN)
 - [PROJECT_ARCHITECTURE.md](PROJECT_ARCHITECTURE.md) - Architecture technique
 
 ## 📁 Structure

@@ -1,0 +1,161 @@
+# 🎯 CONTEXT_PROMPT_v9.txt - ARTcompagnon FINAL
+
+**Date:** 20 mai 2026 | **Status:** Phase 2 ✅ COMPLÉTÉE | **Commit:** 0b80340
+
+---
+
+## ✅ SESSION RÉUSSIE - TOUT FONCTIONNE!
+
+### 📋 Accompli cette session:
+1. **Phase 2 COMPLÈTE:**
+   - ✅ Traducteur FR/EN dynamique (tous les textes)
+   - ✅ Thèmes 'defaut'/'average' avec noms traduits
+   - ✅ Performance optimisée (splash sans traductions inutiles)
+
+2. **Nettoyage repo:**
+   - ✅ Supprimé: SMART_NIND-DENOISE_DOCUMENTATION.md
+   - ✅ Supprimé: Pack CTL ArTherapee/
+   - ✅ Créé: INSTALLATION_DEPENDENCIES_FR.md (multi-distro)
+   - ✅ Créé: INSTALLATION_DEPENDENCIES_EN.md (multi-distro)
+   - ✅ Updaté: README.md + INSTALLATION.md
+
+3. **BUG FIX CRITIQUE:**
+   - ❌ Usercommands ne s'affichaient plus au clic droit ART
+   - 🔍 Cause trouvée: FileType=raw TROP RESTRICTIF dans select-editor.txt
+   - ✅ FIX: FileType=raw|jpg|jpeg|tif|tiff|png (tous les formats!)
+
+4. **Restauration git:**
+   - ✅ Commit 0b80340 restauré (avec traducteur + thèmes)
+
+---
+
+## 🎮 LOGIQUE USERCOMMANDS (MAINTENANT CORRECTE)
+
+### Au clic droit dans navigateur ART:
+
+**Sur RAW:**
+- 🚀 Synde Noise (nind_denoise_raw.sh) - débruitage
+- 🤖 Smart Masking (smart_masking.sh) - masquage IA
+- 💎 Le ARTherapee Compagnon (select-editor.py) - lanceur
+
+**Sur JPG/TIF/PNG:**
+- 🤖 Smart Masking (smart_masking.sh) - masquage IA
+- 💎 Le ARTherapee Compagnon (select-editor.py) - lanceur
+- ❌ Pas nind_denoise (RAW seulement)
+
+---
+
+## 📁 FICHIERS CRITIQUES (.txt usercommands)
+
+### ~/.config/ART/usercommands/select-editor.txt
+```
+[ART UserCommand]
+Label=Le ARTherapee Compagnon
+Command=/home/carafife/art-compagnon/select-editor.py
+FileType=raw|jpg|jpeg|tif|tiff|png
+NumArgs=1
+```
+
+### ~/.config/ART/usercommands/smart_masking.txt
+```
+[ART UserCommand]
+Label=AI masking (SMART)
+Command=./bash/smart_masking.sh
+FileType=jpg|jpeg|tif|tiff|png
+NumArgs=1
+```
+
+### ~/.config/ART/usercommands/nind_denoise_raw.txt
+```
+[ART UserCommand]
+Label=Synde Noise (nind-denoise)
+Command=./bash/nind_denoise_raw.sh
+FileType=raw
+NumArgs=1
+```
+
+---
+
+## 🔧 CHEMINS IMPORTANTS
+
+```
+~/art-compagnon/               → REPO GITHUB (branche test)
+  ├── select-editor.py         → APP PRINCIPALE (avec traducteur + thèmes)
+  ├── themes_data.py           → THÈMES (defaut, average)
+  ├── translations.json        → TRADUCTIONS FR/EN
+  ├── INSTALLATION_DEPENDENCIES_FR/EN.md → DOCS
+  └── [autres fichiers]
+
+~/.config/ART/usercommands/    → FICHIERS .txt USERCOMMANDS
+  ├── select-editor.txt        → ARTcompagnon usercommand
+  ├── smart_masking.txt        → SMART masking usercommand
+  ├── nind_denoise_raw.txt     → nind-denoise usercommand
+  └── bash/                    → Scripts bash
+
+~/.config/ARTcompagnon/        → CONFIG ARTcompagnon
+  └── artcompagnon-config.json → {"theme": "defaut", "language": "fr"}
+
+~/Programmes/
+  ├── SMART/                   → Installation SMART
+  ├── nind-denoise/            → Installation nind-denoise
+  └── ART-ctlscripts/          → Scripts CTL
+```
+
+---
+
+## ⚠️ PIÈGES À ÉVITER
+
+1. **FileType restrictif** → usercommands disparaissent du menu!
+   - ❌ FileType=raw (seulement RAW)
+   - ✅ FileType=raw|jpg|jpeg|tif|tiff|png (tous les formats)
+
+2. **Supprimer ~/.config/ART** → PERTE COMPLÈTE des réglages!
+   - Toujours faire backup d'abord!
+
+3. **Fichiers .bak périmés** → Traducteur/thèmes perdus!
+   - Toujours restaurer depuis git commit, pas depuis .bak
+
+4. **Cache ART** → Pas de rechargement des config!
+   - `killall -9 ART` + `sleep 2` + relancer
+
+---
+
+## 🚀 PROCHAINES ÉTAPES
+
+1. **Phase 3:** Logo/branding "Powered by Carafife"
+2. **Optimisation:** Améliorer performance splash screen
+3. **Documentation:** Guides utilisateur (FR/EN)
+4. Merge test → main (v2.0 stable)
+
+---
+
+## 📝 GIT WORKFLOW
+
+```bash
+# Développement (branche test)
+git checkout test
+git add -A
+git commit -m "description"
+git push origin test
+
+# Release (quand stable)
+git checkout main
+git merge test
+git push origin main
+```
+
+---
+
+## 🎉 STATUT FINAL
+
+✅ **PRODUCTION-READY!**
+
+- Toutes les fonctionnalités Phase 2 fonctionnent
+- Usercommands s'affichent correctement
+- Traducteur FR/EN complet
+- Thèmes dynamiques complets
+- Documentation multi-distro
+- Nettoyage repo effectué
+
+Commit: `0b80340` - Pushé vers GitHub (branche test)
+

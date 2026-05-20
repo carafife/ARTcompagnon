@@ -1,28 +1,79 @@
 ================================================================================
 CONTEXT_PROMPT_v6.txt
-ARTcompagnon Development Session — May 19, 2026
-State complete after smart_masking.sh debugging
+SESSION ARTcompagnon — 19 mai 2026
+État final après débogage et restauration complète
 ================================================================================
 
-## SESSION SUMMARY
+## 🎯 RÉSUMÉ DE LA SESSION
 
-✅ FIXED: smart_masking.sh now works!
-- Detects RAW → exports to JPEG (better quality) → opens SMART GUI
-- Detects JPEG/TIF → opens directly in SMART GUI
-- Waits for SMART GUI to close before terminating (fixed original bug!)
+✅ TOUS LES PROBLÈMES RÉSOLUS!
 
-✅ CONFIGURED: smart_masking.txt path corrected
-- Was: Command=./smart_masking.sh (WRONG)
-- Now: Command=./bash/smart_masking.sh (CORRECT)
+### Problèmes corrigés:
+1. ✅ smart_masking.sh — RESTAURÉ ET FONCTIONNEL (RAW/JPEG/TIF)
+2. ✅ nind_denoise_raw.sh — RESTAURÉ ET FONCTIONNEL
+3. ✅ ART-ctlscripts — RESTAURÉ depuis GitHub
+4. ✅ Toutes les configurations de usercommand corrigées
 
-✅ WORKS VIA:
-- ARTcompagnon (right-click image → ARTcompagnon → Smart Masking)
-- ART usercommand direct (right-click image → AI masking (SMART))
+---
 
-## NEXT STEPS (TOMORROW)
+## ✅ ÉTAT DES SCRIPTS
 
-❌ Test nind_denoise_raw.sh
-❌ Fix ctl-launcher.sh (not working)
-⏳ Commit and push to GitHub test branch
+### 1. smart_masking.sh (FONCTIONNE PARFAITEMENT ✅)
+- Fichiers RAW → export JPEG → ouvre SMART GUI
+- Fichiers JPEG/TIF → ouvre directement SMART GUI
+- Accès: Via ARTcompagnon OU usercommand direct ART
 
+### 2. nind_denoise_raw.sh (FONCTIONNE PARFAITEMENT ✅)
+- Export RAW en TIF avec débruitage
+- Application IA nind-denoise
+- Accès: Via usercommand ART (clic droit RAW → Nind Denoise)
+
+### 3. Scripts CTL (FONCTIONNENT PARFAITEMENT ✅)
+- Source: https://github.com/artraweditor/ART-ctlscripts
+- ctl-launcher.sh SUPPRIMÉ (n'existe plus, scripts affichés directement)
+- Scripts visibles dans ART + sous-dossiers photo/ fonctionnels
+
+---
+
+## 🔧 FICHIERS CONFIGURATION
+
+### smart_masking.txt
+Command=./bash/smart_masking.sh
+
+### nind_denoise_raw.txt
+Command=./bash/nind_denoise_raw.sh
+FileType=raw
+
+---
+
+## 🚀 DÉPENDANCES VÉRIFIÉES
+
+✅ SMART: ~/src/SMART
+✅ nind-denoise: ~/Programmes/nind-denoise
+✅ ART-ctlscripts: ~/Programmes/ART-ctlscripts (GitHub)
+
+---
+
+## 💡 SOLUTIONS APPORTÉES
+
+1. **smart_masking.sh:** Suppression bug race condition (fichier supprimé trop tôt)
+2. **ctl-launcher.sh:** Migration Bitbucket→GitHub, script inutile maintenant
+3. **nind_denoise_raw.sh:** Ajout fichier configuration .txt manquant
+
+---
+
+## 📝 GIT STATUS
+
+Commit: [test 12d7fa7] Session 19-05-2026
+Poussé vers: https://github.com/carafife/ARTcompagnon (branche test)
+
+---
+
+## 🎉 PRÊT POUR LA PRODUCTION ✅
+
+Tous scripts testés et fonctionnels!
+
+================================================================================
+Session terminée: 19-05-2026 13:30 UTC+2
+État: PRÊT POUR LA PRODUCTION ✅
 ================================================================================

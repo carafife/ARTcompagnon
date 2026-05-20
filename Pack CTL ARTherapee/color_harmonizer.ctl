@@ -1,9 +1,9 @@
-// @ART-label: "Color Harmonizer"
-// @ART-param: ["tgt", "Teinte cible",    0.0, 360.0, 30.0,  1.0]
-// @ART-param: ["src", "Teinte source",   0.0, 360.0, 120.0, 1.0]
-// @ART-param: ["wid", "Largeur plage",   0.0, 180.0, 30.0,  1.0]
-// @ART-param: ["str", "Force",           0.0, 1.0,   0.5,   0.01]
-// @ART-param: ["fea", "Adoucissement",   0.0, 90.0,  10.0,  1.0]
+// @ART-label: "Harmoniseur de couleurs"
+// @ART-param: ["srcHue", "Couleur à remplacer (°)", 0.0, 360.0, 120.0, 1.0]
+// @ART-param: ["wid", "Largeur de la plage", 0.0, 180.0, 30.0, 1.0]
+// @ART-param: ["fea", "Adoucissement", 0.0, 90.0, 10.0, 1.0]
+// @ART-param: ["tgtHue", "Nouvelle couleur (°)", 0.0, 360.0, 30.0, 1.0]
+// @ART-param: ["str", "Force", 0.0, 1.0, 0.5, 0.01]
 
 void ART_main(
     varying float r,
@@ -12,14 +12,14 @@ void ART_main(
     output varying float rout,
     output varying float gout,
     output varying float bout,
-    float tgt,
-    float src,
+    float srcHue,
     float wid,
-    float str,
-    float fea
+    float fea,
+    float tgtHue,
+    float str
 )
 {
-    // ----- RGB -> HSL (sans fonctions mathématiques) -----
+    // RGB -> HSL (toujours le même code fiable)
     float maxc = r;
     if (g > maxc) maxc = g;
     if (b > maxc) maxc = b;
@@ -34,13 +34,11 @@ void ART_main(
     float sat = 0.0;
 
     if (delta != 0.0) {
-        // saturation
         float diff = 2.0 * lum - 1.0;
         if (diff < 0.0) diff = -diff;
         float denom = 1.0 - diff;
         sat = delta / denom;
 
-        // teinte
         float htmp;
         if (maxc == r) {
             htmp = (g - b) / delta;
@@ -52,46 +50,42 @@ void ART_main(
             if (htmp < 0.0) htmp = htmp + 6.0;
             if (htmp >= 6.0) htmp = htmp - 6.0;
             htmp = htmp * 60.0;
-        } else { // maxc == b
+        } else {
             htmp = ((r - g) / delta) + 4.0;
             if (htmp < 0.0) htmp = htmp + 6.0;
             if (htmp >= 6.0) htmp = htmp - 6.0;
             htmp = htmp * 60.0;
         }
-        // normalisation sécurité
         if (htmp < 0.0) htmp = htmp + 360.0;
         if (htmp >= 360.0) htmp = htmp - 360.0;
         hue = htmp;
     }
 
-    // ----- Masque autour de la teinte source -----
-    float dist = hue - src;
+    // Masque
+    float dist = hue - srcHue;
     if (dist > 180.0) dist = dist - 360.0;
     if (dist < -180.0) dist = dist + 360.0;
     float adist = dist;
-    if (adist < 0.0) adist = -adist;   // abs
+    if (adist < 0.0) adist = -adist;
     float mask = 0.0;
     if (adist <= wid) {
         mask = 1.0;
     } else if (adist <= wid + fea) {
         mask = 1.0 - (adist - wid) / fea;
-    } else {
-        mask = 0.0;
     }
 
-    // ----- Nouvelle teinte -----
-    float dH = tgt - hue;
+    // Nouvelle teinte
+    float dH = tgtHue - hue;
     if (dH > 180.0) dH = dH - 360.0;
     if (dH < -180.0) dH = dH + 360.0;
     float newHue = hue + dH * mask * str;
     if (newHue < 0.0) newHue = newHue + 360.0;
     if (newHue >= 360.0) newHue = newHue - 360.0;
 
-    // ----- HSL -> RGB (variables locales distinctes des sorties) -----
+    // HSL -> RGB
     float ro;
     float go;
     float bo;
-
     if (sat == 0.0) {
         ro = lum;
         go = lum;
@@ -106,7 +100,6 @@ void ART_main(
         float p = 2.0 * lum - q;
         float hk = newHue / 360.0;
 
-        // Rouge
         float tR = hk + 1.0/3.0;
         if (tR < 0.0) tR = tR + 1.0;
         if (tR > 1.0) tR = tR - 1.0;
@@ -120,7 +113,6 @@ void ART_main(
             ro = p;
         }
 
-        // Vert
         float tG = hk;
         if (tG < 0.0) tG = tG + 1.0;
         if (tG > 1.0) tG = tG - 1.0;
@@ -134,7 +126,6 @@ void ART_main(
             go = p;
         }
 
-        // Bleu
         float tB = hk - 1.0/3.0;
         if (tB < 0.0) tB = tB + 1.0;
         if (tB > 1.0) tB = tB - 1.0;

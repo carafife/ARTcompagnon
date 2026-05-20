@@ -14,6 +14,11 @@
       "name": "Luminance-hdr",
       "description": "HDR",
       "command": "/usr/bin/luminance-hdr"
+    },
+    {
+      "name": "Hugin",
+      "description": "Panoramas et fusion d'expo",
+      "command": "hugin"
     }
   ]
 }

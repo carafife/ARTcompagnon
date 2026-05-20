@@ -22,9 +22,18 @@ C'est tout ! Le script crée automatiquement :
 
 ## 📦 Prérequis
 
+### ⚠️ Important
+**Le ARTherapee Compagnon fonctionne GARANTIE avec ART compilé uniquement.**
+
+ARTcompagnon ne fonctionne pas avec:
+- ❌ Flatpak (ART sandboxé)
+- ❌ AppImage (ART portable)
+
+**Vous devez compiler ART depuis les sources.**
+
 ### Système
 - **Linux** (Fedora, Ubuntu, Debian, etc.)
-- **ART** installé (https://github.com/agriggio/art)
+- **ART compilé** (https://github.com/agriggio/art)
 
 ### Logiciels
 ```bash
