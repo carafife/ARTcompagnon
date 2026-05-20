@@ -42,6 +42,9 @@ sudo dnf install python3 python3-pyqt5 git gnome-terminal
 
 # Ubuntu/Debian
 sudo apt install python3 python3-pyqt5 git gnome-terminal
+
+# Arch Linux
+sudo pacman -S python pyqt5 git gnome-terminal
 ```
 
 ### Python

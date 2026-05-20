@@ -1,22 +1,24 @@
-<div align="center">
-  <img src="assets/artcompagnon-logo.png" width="300" alt="ARTcompagnon Logo">
-</div>
-
 # 🎨 Le ARTherapee Compagnon
 
-Un gestionnaire d'éditeurs et de scripts pour ART (ART Raw Editor).
+Lanceur d'applications et de scripts pour ART (ARTherapee).
 
-**Version:** v1.5 | **Status:** Stable ✅
+**Version:** v2.0 | **Status:** Stable ✅
 
 ## 🌟 Caractéristiques
 
-- 📋 Gérez vos éditeurs externes (GIMP, Krita, RawTherapee, Hugin, etc.)
-- 🔧 **Scripts multi-langages:** Bash, Python, Lua
-- 📂 **Arborescence intelligente** - Organisation auto des scripts par type
-- 📸 **Support de plusieurs fichiers** - Sélectionnez 3+ photos et lancez Hugin ou HDR Merge !
-- 🌙 Interface moderne avec thème sombre
-- 🚀 Installation automatisée
-- 🇫🇷 Entièrement en français
+- 📋 **Éditeurs externes** - GIMP, Krita, RawTherapee, Hugin, Lightzone, etc.
+- 🔧 **Scripts multi-langages** - Bash, Python, Lua
+- 📂 **Arborescence intelligente** - Organisation auto par type
+- 📸 **Multi-fichiers** - Sélectionnez plusieurs photos et lancez Hugin/HDR!
+- 🌙 **Thèmes dynamiques** - Défaut & Average
+- 🇫🇷 🇬🇧 **Multilingue** - Français & Anglais
+- 🚀 Installation simple
+
+## ⚠️ Prérequis
+
+**ART COMPILÉ OBLIGATOIRE** (pas Flatpak/AppImage)
+
+ARTcompagnon ne fonctionne que si ART est compilé depuis source.
 
 ## 📦 Installation rapide
 
@@ -26,63 +28,43 @@ cd ARTcompagnon
 ./install.sh
 ```
 
-Puis relancez ART et cliquez sur "External Editor" !
-
-⚠️ **Important:** ARTcompagnon fonctionne **GARANTIE avec ART compilé uniquement** (pas Flatpak/AppImage).
+Relancez ART!
 
 ## 🎯 Utilisation
 
-### Lancer un éditeur sur vos photos
-1. Sélectionnez **1 ou plusieurs images RAW** dans ART
-2. Clic droit → **Le ARTherapee Compagnon**
-3. Choisissez votre éditeur (GIMP, Hugin, etc.)
-4. **Toutes les photos sélectionnées** sont envoyées ! ✅
+### Lancer un éditeur
 
-### Créer et exécuter des scripts
+**Option 1 - Bouton "Editeur externe"** (Preferences)
+- ART → Preferences → External Editor → Cliquez le bouton
 
-#### Scripts Bash 🔧
+**Option 2 - Clic droit** (Navigateur fichiers)
+- Sélectionnez image(s) → Clic droit → Le ARTherapee Compagnon → Choisissez éditeur
+
+### Créer vos scripts
+
+**Bash** `~/.config/ART/usercommands/bash/mon_script.sh`
 ```bash
-# ~/.config/ART/usercommands/bash/mon_script.sh
 #!/bin/bash
-echo "Photo reçue: $1"
+echo "Photo: $1"
 ```
 
-#### Scripts Python 🐍
+**Python** `~/.config/ART/usercommands/python/mon_script.py`
 ```python
-# ~/.config/ART/usercommands/python/mon_script.py
 import sys
-print(f"Photo reçue: {sys.argv[1]}")
+print(f"Photo: {sys.argv[1]}")
 ```
 
-#### Scripts Lua 🌙
+**Lua** `~/.config/ART/usercommands/lua/mon_script.lua`
 ```lua
--- ~/.config/ART/usercommands/lua/mon_script.lua
-print("Photo reçue: " .. arg[1])
+print("Photo: " .. arg[1])
 ```
-
-### Exemple : Fusionner 3 photos avec Hugin
-ART → Sélectionnez 3 photos RAW d'expositions différentes → Clic droit → Le ARTherapee Compagnon → Cliquez "Hugin" → Hugin reçoit les 3 fichiers → Fusion HDR ! 🎉
 
 ## 📚 Documentation
 
-- [INSTALLATION.md](INSTALLATION.md) - Guide d'installation d'ARTcompagnon
-- [INSTALLATION_DEPENDENCIES_FR.md](INSTALLATION_DEPENDENCIES_FR.md) - Installation SMART / nind-denoise / Scripts CTL (FR)
-- [INSTALLATION_DEPENDENCIES_EN.md](INSTALLATION_DEPENDENCIES_EN.md) - Installing SMART / nind-denoise / CTL Scripts (EN)
+- [INSTALLATION.md](INSTALLATION.md) - Installation ARTcompagnon
 - [PROJECT_ARCHITECTURE.md](PROJECT_ARCHITECTURE.md) - Architecture technique
-
-## 📁 Structure
-
-- `select-editor.py` - Application principale (support bash/python/lua + multi-fichiers)
-- `select-editor-config.json` - Configuration des éditeurs
-- `~/.config/ART/usercommands/bash/` - Scripts bash personnalisés
-- `~/.config/ART/usercommands/python/` - Scripts Python personnalisés
-- `~/.config/ART/usercommands/lua/` - Scripts Lua personnalisés
-
-## 🔗 Liens
-
-- GitHub: https://github.com/carafife/ARTcompagnon
-- ART Raw Editor: https://github.com/agriggio/art
+- [COMPLETE_SETUP_GUIDE_FR.md](COMPLETE_SETUP_GUIDE_FR.md) - Guide complet (ART + dépendances optionnelles)
 
 ## 📝 Licence
 
-MIT - **Créé avec ❤️ par carafife**
+MIT - Créé avec ❤️ par carafife

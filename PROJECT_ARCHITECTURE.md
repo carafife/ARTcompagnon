@@ -1,241 +1,93 @@
-# 🎨 ARTcompagnon - Architecture & Documentation
+# 🎨 ARTcompagnon - Architecture
 
-**Dernière mise à jour:** 16 mai 2026  
-**Statut:** v1.1-beta  
-**Créateur:** carafife (tutoriels photo libres)
+**Dernière mise à jour:** 20 mai 2026  
+**Statut:** v2.0 Stable  
+**Créateur:** carafife
 
 ---
 
 ## 📋 Table des Matières
-1. [Architecture du Projet](#architecture)
-2. [Environnement](#environnement)
-3. [Outils Intégrés](#outils-intégrés)
-4. [Chemins Critiques](#chemins-critiques)
-5. [Limitations Connues](#limitations-connues)
-6. [Dépendances](#dépendances)
-7. [Workflow Utilisateur](#workflow-utilisateur)
-8. [Points d'Attention](#points-d-attention)
-9. [Références](#références)
+1. [Architecture](#architecture)
+2. [Structure des répertoires](#structure)
+3. [Configuration ART](#configuration-art)
+4. [Workflow Git](#workflow-git)
 
 ---
 
-## 🏗️ Architecture du Projet
+## 🏗️ Architecture
 
-### Structure des Répertoires
+ARTcompagnon est un **lanceur d'applications** pour ART (ARTherapee).
+
+Il se lance de 2 façons:
+1. **Bouton "Editeur externe"** dans ART Preferences
+2. **Clic droit** (usercommand) dans navigateur fichiers ART
+
+Quand lancé, ARTcompagnon:
+- Affiche une arborescence des scripts
+- Permet de lancer des scripts bash/python/lua
+- Passe l'image actuelle au script
+
+---
+
+## 📁 Structure des répertoires
 
 ```
-~/art-compagnon/                    ← REPO LOCAL (connecté GitHub)
-├── .git/                           ← Contrôle de version
-├── select-editor.py                ← App principale Qt/Python
-├── select-editor-config.json       ← Config des éditeurs
-│   ├── ctl-launcher.sh            ← Lance les scripts CTL
-│   ├── smart_masking.sh           ← Lance SMART
-│   └── lightzone-wrapper.sh       ← Wrapper LightZone
-├── PROJECT_ARCHITECTURE.md        ← CETTE DOC
-├── SMART_NIND-DENOISE_DOCUMENTATION.md
+~/art-compagnon/                    ← REPO LOCAL (GitHub)
+├── select-editor.py                ← App principale
+├── themes_data.py                  ← Thèmes dynamiques
+├── translations.json               ← FR/EN translations
 ├── README.md
-└── VERSION
+├── INSTALLATION.md
+└── [autres fichiers]
 
-~/Programmes/                        ← Outils externes
-├── ART/                            ← Image processor (compilé GitHub)
-├── SMART/                          ← AI mask builder (SAM2)
-├── sam2/                           ← Segmentation model (Meta)
-├── nind-denoise/                   ← AI denoiser
-└── ART-ctlscripts/                 ← Scripts CTL collection
-
-~/.config/ART/                       ← Config ART
-├── usercommands/
-│   ├── select-editor.txt          ← AC command
-│   └── nind_denoise.txt           ← nind-denoise command
-├── ctlscripts/                     ← CTL scripts folder
-└── SMART.json                      ← SMART config
-```
-
-### Points Critiques de l'Architecture
-
-⚠️ **IMPORTANT:** 
-- **Repo local = `~/art-compagnon/`** (minuscule, connecté GitHub)
-- **ANCIEN dossier `~/Programmes/ARTcompagnon/` = SUPPRIMÉ** (était une copie)
-- AC utilise `select-editor.py` depuis `~/art-compagnon/`
-
----
-
-## 💻 Environnement
-
-**Système:** Fedora 44 (NOT Ubuntu/Debian)
-- Package manager: `dnf` (pas `apt`)
-- Shell: `bash`
-- GPU: AMD Radeon (pas CUDA → utiliser `device=cpu`)
-
-**Python:** 
-- Venv pour SMART: `~/Programmes/SMART/SMART-env/`
-- Venv pour nind-denoise: `~/Programmes/nind-denoise-env/`
-- Venv pour SAM2: dans SMART-env
-
----
-
-## 🛠️ Outils Intégrés
-
-### 1. SMART (SAM2 Mask Builder)
-
-**Fonction:** Créer des masques intelligents basés sur segmentation d'images
-
-**Installation:** `~/Programmes/SMART/`
-
-**Limitations:**
-- ❌ Ne lit que **JPG/TIF/PNG** (pas RAW - limitation Pillow)
-- 📌 Utilisateurs doivent exporter RAW en JPG d'abord
-- FileType dans `select-editor.txt`: `jpg|jpeg|tif|tiff|png`
-
-**Configuration:**
-- Config file: `~/.config/ART/SMART.json`
-- Device: `cpu` (AMD Radeon)
-- Modèle actif: `sam2.1_hiera_base_plus.pt` (309 MB)
-
----
-
-### 2. nind-denoise (AI Denoiser)
-
-**Fonction:** Réduire le bruit des images haute sensibilité
-
-**Installation:** `~/Programmes/nind-denoise/`
-
-**Limitations:**
-- ❌ Ne lit que **RAW**
-- ⏱️ Très lent sur CPU (AMD Radeon)
-- 📁 Crée fichier `-denoised.tif` en sortie
-
----
-
-### 3. ART-ctlscripts (CTL Collection)
-
-**Fonction:** Scripts CTL pour transformations couleur avancées
-
-**Installation:** `~/Programmes/ART-ctlscripts/`
-
-**Contient:** `_artlib.ctl`, `shadowboost.ctl`, `bwmix.ctl`, etc.
-
----
-
-## 📍 Chemins Critiques
-
-```
-SMART:              ~/Programmes/SMART/
-nind-denoise:       ~/Programmes/nind-denoise/
-ART:                ~/Programmes/ART/
-ART-ctlscripts:     ~/Programmes/ART-ctlscripts/
-
-Config ART:         ~/.config/ART/
-  - usercommands:   ~/.config/ART/usercommands/
-  - ctlscripts:     ~/.config/ART/ctlscripts/
-  - SMART config:   ~/.config/ART/SMART.json
-
-AC repo:            ~/art-compagnon/ ← CELUI-CI!
+~/.config/ART/usercommands/         ← Config ART
+├── select-editor.txt               ← ARTcompagnon usercommand
+└── bash/
+    └── [vos scripts bash]
 ```
 
 ---
 
-## ⚠️ Limitations Connues
+## ⚙️ Configuration ART
 
-| Outil | Formats | Limitations |
-|-------|---------|-------------|
-| SMART | JPG/TIF/PNG | Pas RAW (Pillow) |
-| nind-denoise | RAW | Lent CPU, crée TIF |
-| CTL Scripts | - | Nécessite ENABLE_CTL=ON |
-| AC | bash scripts | Pas Python/CTL natif (évolution prévue) |
+### File: `~/.config/ART/options`
 
----
+Section `[External Editor]` DOIT avoir:
+```
+EditorKind=1
+CustomEditor=
+OutputDir=0
+CustomOutputDir=
+Float32=false
+BypassOutputProfile=false
+```
 
-## 🎯 Workflow Utilisateur
+### File: `~/.config/ART/usercommands/select-editor.txt`
 
-### SMART
-1. RAW dans ART → Exporter JPG
-2. Clic droit → ARTcompagnon → SMART
-3. Shift+clic = point, Shift+clic droit = retrait
-
-### nind-denoise
-1. RAW dans ART
-2. Clic droit → "AI denoise"
-3. Attendre traitement
-
-### CTL Scripts
-1. Image dans ART
-2. Clic droit → ARTcompagnon → ctl-launcher.sh
-3. Choisir script → Relancer ART
-4. Color/Tone Correction → LUT
-
----
-
-## 🚨 Points d'Attention
-
-### 1. Dossiers
-❌ `~/Programmes/ARTcompagnon/` (supprimé)
-✅ `~/art-compagnon/` (repo git)
-
-### 2. SMART et RAW
-❌ SMART ne lit JAMAIS RAW
-✅ Exporter RAW → JPG d'abord
-
-### 3. ART et CTL
-❌ CTL absent = ART sans ENABLE_CTL
-✅ Recompiler avec dépendances CTL
-
-### 4. GPU
-⚠️ AMD Radeon n'a pas CUDA
-✅ Utiliser `device=cpu`
-
-### 5. AC vs usercommands
-- AC = depuis éditeur ART
-- usercommands = depuis navigateur fichiers
-
----
-
-## 📚 Références
-
-- ARTcompagnon: https://github.com/carafife/ARTcompagnon
-- ART: https://github.com/agriggio/art
-- SMART: https://github.com/artraweditor/SMART
-- SAM2: https://github.com/facebookresearch/sam2
-- nind-denoise: https://github.com/agriggio/nind-denoise
-- ART-ctlscripts: https://github.com/artraweditor/ART-ctlscripts
-- Forum ART FR: https://forum.artherapee.fr/
+```
+[ART UserCommand]
+Label=Le ARTherapee Compagnon
+Command=/home/carafife/art-compagnon/select-editor.py
+FileType=raw|jpg|jpeg|tif|tiff|png
+NumArgs=1
+```
 
 ---
 
 ## 🔄 Workflow Git
 
-### Branches
+- **`main`** = Versions STABLES (production)
+- **`test`** = Branche de DÉVELOPPEMENT
 
-- **`main`** = Versions STABLES (prod)
-- **`test`** = Branche de TEST (développement)
-
-### Processus de validation
-
-```
-1. Commit sur test
-   git checkout test
-   git add .
-   git commit -m "..."
-   git push origin test
-
-2. TESTER les modifs
-
-3. Merger vers main (une fois validé)
-   git checkout main
-   git merge test
-   git push origin main
-```
-
-⚠️ **IMPORTANT:** Ne JAMAIS pousser directement sur `main`!
+Processus:
+1. Développer sur `test`
+2. Tester complètement
+3. Merger vers `main` quand validé
 
 ---
 
-## 🚀 Évolutions Prévues
+## ⚠️ Prérequis
 
-- ✋ AC supporte bash scripts → Évolution vers **Python + CTL natif**
-- ✋ SMART RAW limitation → Solution: workflow RAW→JPG (OK pour MVP)
-- ✋ Plugin system pour AC → Architecture modulaire future
+✅ **ART COMPILÉ OBLIGATOIRE** (pas Flatpak/AppImage)
 
----
-
-**Pour relancer la machine:** Dis `@ARTCOMPAGNON-CONTEXT` à Claude!
+ARTcompagnon ne fonctionne que si ART est compilé depuis source.
