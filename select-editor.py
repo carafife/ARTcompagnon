@@ -7,6 +7,39 @@ from PyQt5.QtCore import Qt, QSize, pyqtSignal, QObject
 from PyQt5.QtGui import QFont, QPixmap, QTextCursor
 from themes_data import THEMES
 
+# ============================================
+# Gestion des thèmes
+# ============================================
+def load_theme_config():
+    """Charge la config du thème"""
+    config_path = os.path.expanduser("~/.config/ARTcompagnon/artcompagnon-config.json")
+    try:
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+            return config.get('theme', 'defaut')
+    except:
+        return 'defaut'
+
+def save_theme_config(theme_name):
+    """Sauvegarde la config du thème"""
+    config_path = os.path.expanduser("~/.config/ARTcompagnon/artcompagnon-config.json")
+    try:
+        config = {}
+        if os.path.exists(config_path):
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+        config['theme'] = theme_name
+        with open(config_path, 'w') as f:
+            json.dump(config, f, indent=2)
+    except:
+        pass
+
+def apply_theme_to_app(parent_widget, theme_name):
+    """Applique le thème au widget parent"""
+    if theme_name in THEMES:
+        stylesheet = THEMES[theme_name]
+        parent_widget.setStyleSheet(stylesheet)
+
 class OutputEmitter(QObject):
     output_signal = pyqtSignal(str)
 
@@ -74,7 +107,8 @@ class ARTCompanion(QDialog):
             os.makedirs(folder_path, exist_ok=True)
         self.load_config()
         self.init_ui()
-        self.apply_theme()
+        current_theme = load_theme_config()
+        apply_theme_to_app(self, current_theme)
     
     def find_terminal(self):
         """Trouve un terminal disponible"""
@@ -111,7 +145,7 @@ class ARTCompanion(QDialog):
         
         logo_label = QLabel()
         if os.path.exists(self.logo_path):
-            pixmap = QPixmap(self.logo_path).scaledToWidth(80, Qt.SmoothTransformation)
+            pixmap = QPixmap(self.logo_path).scaledToWidth(150, Qt.SmoothTransformation)
             logo_label.setPixmap(pixmap)
         header_layout.addWidget(logo_label)
         header_layout.addStretch()
@@ -155,7 +189,7 @@ class ARTCompanion(QDialog):
         footer = QLabel('<a href="https://artherapee.fr/" style="color: #c97d3a; text-decoration: none;">🌐 artherapee.fr</a>')
         footer.setOpenExternalLinks(True)
         footer.setAlignment(Qt.AlignCenter)
-        footer_font = QFont("Sans", 8)
+        footer_font = QFont("Sans", 12)
         footer.setFont(footer_font)
         main_layout.addWidget(footer)
         
@@ -167,6 +201,10 @@ class ARTCompanion(QDialog):
         # Thème
         self.theme_combo = QComboBox()
         self.theme_combo.addItems(list(THEMES.keys()))
+        # Charger le thème sauvegardé et définir l'index
+        current_theme = load_theme_config()
+        theme_index = list(THEMES.keys()).index(current_theme) if current_theme in THEMES else 0
+        self.theme_combo.setCurrentIndex(theme_index)
         self.theme_combo.currentTextChanged.connect(self.on_theme_changed)
         layout.addWidget(self.theme_combo)
         
@@ -316,7 +354,8 @@ class ARTCompanion(QDialog):
             self.remove_combo.addItem(editor['name'], editor)
     
     def on_theme_changed(self, theme_name):
-        self.setStyleSheet(THEMES[theme_name])
+        apply_theme_to_app(self, theme_name)
+        save_theme_config(theme_name)
 
     def launch_selected_editor(self):
         item = self.editors_list.currentItem()
@@ -606,9 +645,7 @@ class ARTCompanion(QDialog):
         # Afficher un message pendant le téléchargement
         QMessageBox.information(self, "Info", "⏳ Téléchargement et installation en cours...\nCela peut prendre quelques secondes.")
 
-    def apply_theme(self):
-        dark_stylesheet = """QDialog, QWidget { background-color: #1a1a1a; color: #e8e8e8; } QLabel { color: #e8e8e8; } QListWidget, QLineEdit, QComboBox, QTextEdit { background-color: #252525; border: 1px solid #3a3a3a; color: #e8e8e8; border-radius: 4px; padding: 5px; } QListWidget::item { padding: 8px; border-radius: 4px; } QListWidget::item:selected { background-color: #c97d3a; color: #ffffff; } QListWidget::item:hover { background-color: #2f2f2f; } QPushButton { background-color: #c97d3a; color: #ffffff; border: none; border-radius: 4px; font-weight: bold; font-size: 10px; padding: 3px; font-family: Sans; } QPushButton:hover { background-color: #d9945a; } QPushButton:pressed { background-color: #b96b2a; } QTabWidget::pane { border: 1px solid #3a3a3a; } QTabBar::tab { background-color: #252525; color: #e8e8e8; padding: 5px 15px; border: 1px solid #3a3a3a; } QTabBar::tab:selected { background-color: #c97d3a; color: #ffffff; }"""
-        self.setStyleSheet(dark_stylesheet)
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -622,4 +659,9 @@ if __name__ == "__main__":
         sys.exit(1)
     app = QApplication(sys.argv)
     companion = ARTCompanion(config, sys.argv[1:], logo)
+    # Appliquer le thème une 2e fois pour le startup
+    current_theme = load_theme_config()
+    apply_theme_to_app(companion, current_theme)
+    app.processEvents()
+    companion.show()
     companion.exec_()
