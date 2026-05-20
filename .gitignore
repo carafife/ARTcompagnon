@@ -11,3 +11,7 @@ build/
 .idea/
 CONTEXT_PROMPT_v2.txt
 CONTEXT_PROMPT_v2.txt
+
+# Context & Documentation personnelle
+CONTEXT_PROMPT*.txt
+LISEZMOI_INTERNE.txt
