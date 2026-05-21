@@ -123,7 +123,7 @@ class SplashScreen(QDialog):
         layout.addWidget(logo_container)
         
         # Texte - sera animé
-        self.text_label = QLabel("v2.0 Stable - Powered by Carafife")
+        self.text_label = QLabel("v2.1 Beta - Powered by Carafife")
         text_font = QFont("Sans", 14)
         text_font.setBold(True)
         self.text_label.setFont(text_font)
@@ -285,7 +285,7 @@ class ARTCompanion(QDialog):
         self.move(center_x, max(0, center_y))
     
     def init_ui(self):
-        self.setWindowTitle("Le ARTherapee Compagnon 🇫🇷 v2.0 Stable")
+        self.setWindowTitle("Le ARTherapee Compagnon 🇫🇷 v2.1 Beta")
         self.setGeometry(100, 100, 700, 580)
         self.setMinimumSize(700, 580)
         
@@ -652,7 +652,7 @@ class ARTCompanion(QDialog):
             try:
                 cmd = editor['command']
                 cmd = os.path.expandvars(os.path.expanduser(cmd))
-                subprocess.Popen([cmd] + self.image_files)
+                subprocess.Popen(cmd + ' ' + ' '.join(self.image_files), shell=True)
                 self.accept()
             except Exception as e:
                 QMessageBox.critical(self, "Erreur", f"Impossible de lancer {editor['name']}: {e}")
