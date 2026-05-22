@@ -909,7 +909,8 @@ class ARTCompanion(QDialog):
                 urllib.request.urlretrieve(pack_url, pack_path)
                 
                 # Lancer le script d'installation
-                install_script = os.path.expanduser("~/Programmes/ARTcompagnon-Scripts/install-scripts/install-pack.sh")
+                script_dir = os.path.dirname(os.path.abspath(__file__))
+                install_script = os.path.join(script_dir, "install-scripts", "install-pack.sh")
                 result = subprocess.run(['bash', install_script, pack_path], capture_output=True, text=True)
                 
                 # Nettoyer
