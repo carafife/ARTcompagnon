@@ -123,7 +123,7 @@ class SplashScreen(QDialog):
         layout.addWidget(logo_container)
         
         # Texte - sera animé
-        self.text_label = QLabel("v2.6 Beta - Powered by Carafife")
+        self.text_label = QLabel("v3.1 Beta - Powered by Carafife")
         text_font = QFont("Sans", 14)
         text_font.setBold(True)
         self.text_label.setFont(text_font)
@@ -285,7 +285,7 @@ class ARTCompanion(QDialog):
         self.move(center_x, max(0, center_y))
     
     def init_ui(self):
-        self.setWindowTitle("Le ARTherapee Compagnon 🇫🇷 v2.6 Beta")
+        self.setWindowTitle("Le ARTherapee Compagnon 🇫🇷 v3.1 Beta")
         self.setGeometry(100, 100, 700, 580)
         self.setMinimumSize(700, 580)
         
@@ -906,6 +906,10 @@ class ARTCompanion(QDialog):
                 temp_dir = tempfile.mkdtemp()
                 pack_path = os.path.join(temp_dir, 'pack-basic.zip')
                 
+<<<<<<< HEAD
+=======
+                # Télécharger avec timeout
+>>>>>>> a23c0ed (✅ Fix: Remove timeout (use default urllib timeout))
                 urllib.request.urlretrieve(pack_url, pack_path)
                 
                 # Lancer le script d'installation
