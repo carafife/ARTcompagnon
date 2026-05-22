@@ -7,10 +7,9 @@ from PyQt5.QtCore import Qt, QSize, pyqtSignal, QObject
 from PyQt5.QtGui import QFont, QPixmap, QTextCursor
 from themes_data import THEMES
 
-# ============================================
+# =====================================
 # Gestion des traductions
-# ============================================
-TRANSLATIONS = {}
+# =====================================TRANSLATIONS = {}
 
 def load_translations():
     """Charge les traductions depuis translations.json"""
@@ -56,9 +55,9 @@ def save_language_config(language):
 # Charger les traductions au démarrage
 load_translations()
 
-# ============================================
+# =====================================
 # Gestion des thèmes
-# ============================================
+# =====================================
 def load_theme_config():
     """Charge la config du thème"""
     config_path = os.path.expanduser("~/.config/ARTcompagnon/artcompagnon-config.json")
@@ -89,10 +88,9 @@ def apply_theme_to_app(parent_widget, theme_name):
         stylesheet = THEMES[theme_name]
         parent_widget.setStyleSheet(stylesheet)
 
-# ============================================
+# =====================================
 # Splash Screen
-# ============================================
-class SplashScreen(QDialog):
+# =====================================class SplashScreen(QDialog):
     def __init__(self, logo_path):
         super().__init__()
         self.logo_path = logo_path
@@ -906,10 +904,7 @@ class ARTCompanion(QDialog):
                 temp_dir = tempfile.mkdtemp()
                 pack_path = os.path.join(temp_dir, 'pack-basic.zip')
                 
-<<<<<<< HEAD
-=======
                 # Télécharger avec timeout
->>>>>>> a23c0ed (✅ Fix: Remove timeout (use default urllib timeout))
                 urllib.request.urlretrieve(pack_url, pack_path)
                 
                 # Lancer le script d'installation
