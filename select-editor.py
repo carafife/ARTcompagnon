@@ -90,7 +90,8 @@ def apply_theme_to_app(parent_widget, theme_name):
 
 # =====================================
 # Splash Screen
-# =====================================class SplashScreen(QDialog):
+# =====================================
+class SplashScreen(QDialog):
     def __init__(self, logo_path):
         super().__init__()
         self.logo_path = logo_path
