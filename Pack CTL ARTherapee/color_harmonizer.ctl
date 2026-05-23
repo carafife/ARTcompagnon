@@ -1,4 +1,5 @@
 // @ART-label: "Harmoniseur de couleurs"
+// Powered By Carafife And DeepSeek V4
 // @ART-param: ["srcHue", "Couleur à remplacer (°)", 0.0, 360.0, 120.0, 1.0]
 // @ART-param: ["wid", "Largeur de la plage", 0.0, 180.0, 30.0, 1.0]
 // @ART-param: ["fea", "Adoucissement", 0.0, 90.0, 10.0, 1.0]
@@ -19,7 +20,6 @@ void ART_main(
     float str
 )
 {
-    // RGB -> HSL (toujours le même code fiable)
     float maxc = r;
     if (g > maxc) maxc = g;
     if (b > maxc) maxc = b;
@@ -29,7 +29,6 @@ void ART_main(
     float delta = maxc - minc;
 
     float lum = (maxc + minc) / 2.0;
-
     float hue = 0.0;
     float sat = 0.0;
 
@@ -61,7 +60,6 @@ void ART_main(
         hue = htmp;
     }
 
-    // Masque
     float dist = hue - srcHue;
     if (dist > 180.0) dist = dist - 360.0;
     if (dist < -180.0) dist = dist + 360.0;
@@ -74,7 +72,6 @@ void ART_main(
         mask = 1.0 - (adist - wid) / fea;
     }
 
-    // Nouvelle teinte
     float dH = tgtHue - hue;
     if (dH > 180.0) dH = dH - 360.0;
     if (dH < -180.0) dH = dH + 360.0;
@@ -82,7 +79,6 @@ void ART_main(
     if (newHue < 0.0) newHue = newHue + 360.0;
     if (newHue >= 360.0) newHue = newHue - 360.0;
 
-    // HSL -> RGB
     float ro;
     float go;
     float bo;
