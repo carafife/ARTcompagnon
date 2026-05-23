@@ -19,6 +19,21 @@
       "name": "Hugin",
       "description": "Panoramas et fusion d'expo",
       "command": "hugin"
+    },
+    {
+      "name": "darktable",
+      "description": "raw",
+      "command": "flatpak run org.darktable.Darktable"
+    },
+    {
+      "name": "LightZone",
+      "description": "Raw",
+      "command": "flatpak run io.github.ktgw0316.LightZone"
+    },
+    {
+      "name": "Geequie",
+      "description": "Visionneuse",
+      "command": "/usr/bin/geeqie"
     }
   ]
 }
