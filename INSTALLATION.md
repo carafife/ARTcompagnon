@@ -4,9 +4,9 @@
 
 ### Étape 1 : Cloner le dépôt
 ```bash
-cd ~
-git clone https://github.com/votre-username/ARTcompagnon.git
-cd art-compagnon
+git clone https://github.com/carafife/ARTcompagnon.git
+cd ARTcompagnon
+./install.sh
 ```
 
 ### Étape 2 : Lancer l'installation
@@ -17,6 +17,9 @@ cd art-compagnon
 C'est tout ! Le script crée automatiquement :
 - ✅ Le fichier de configuration dans `~/.config/ART/usercommands/`
 - ✅ Les dossiers pour les scripts (`bash/`, `python/`, `lua/`)
+- ✅ Les dépendances Python (PyQt5, tkinter, Pillow, reportlab) : détectées et installées via le gestionnaire de paquets de votre distribution (dnf/apt/pacman/zypper)
+
+> La liste manuelle ci-dessous n'est utile que si vous voulez installer les dépendances vous-même ou en cas de distribution non reconnue.
 
 ---
 
@@ -38,13 +41,13 @@ ARTcompagnon ne fonctionne pas avec:
 ### Logiciels
 ```bash
 # Fedora
-sudo dnf install python3 python3-pyqt5 git gnome-terminal
+sudo dnf install python3 python3-qt5-base python3-tkinter python3-pillow python3-pillow-tk python3-reportlab git gnome-terminal
 
 # Ubuntu/Debian
-sudo apt install python3 python3-pyqt5 git gnome-terminal
+sudo apt install python3 python3-pyqt5 python3-tk python3-pil python3-pil.imagetk python3-reportlab git gnome-terminal
 
 # Arch Linux
-sudo pacman -S python pyqt5 git gnome-terminal
+sudo pacman -S python python-pyqt5 tk python-pillow python-reportlab git gnome-terminal
 ```
 
 ### Python
