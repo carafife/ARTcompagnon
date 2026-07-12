@@ -107,7 +107,65 @@ echo "   ~/.config/ARTcompagnon/artcompagnon-config.json"
 echo ""
 
 # ============================================
-# ÉTAPE 6 : Vérification finale
+# ÉTAPE 6 : Vérifier / installer les dépendances Python
+# ============================================
+echo "🐍 Vérification des dépendances Python..."
+
+# Détection du gestionnaire de paquets + noms de paquets adaptés à la distro
+PKG_MGR=""; PKG_INSTALL=""
+PYQT_PKG=""; TK_PKG=""; PIL_PKG=""; RL_PKG=""
+if command -v dnf &>/dev/null; then
+    PKG_MGR="dnf"; PKG_INSTALL="sudo dnf install -y"
+    PYQT_PKG="python3-qt5-base"; TK_PKG="python3-tkinter"
+    PIL_PKG="python3-pillow python3-pillow-tk"; RL_PKG="python3-reportlab"
+elif command -v apt &>/dev/null; then
+    PKG_MGR="apt"; PKG_INSTALL="sudo apt install -y"
+    PYQT_PKG="python3-pyqt5"; TK_PKG="python3-tk"
+    PIL_PKG="python3-pil python3-pil.imagetk"; RL_PKG="python3-reportlab"
+elif command -v pacman &>/dev/null; then
+    PKG_MGR="pacman"; PKG_INSTALL="sudo pacman -S --noconfirm"
+    PYQT_PKG="python-pyqt5"; TK_PKG="tk"
+    PIL_PKG="python-pillow"; RL_PKG="python-reportlab"
+elif command -v zypper &>/dev/null; then
+    PKG_MGR="zypper"; PKG_INSTALL="sudo zypper install -y"
+    PYQT_PKG="python3-qt5"; TK_PKG="python3-tk"
+    PIL_PKG="python3-Pillow python3-Pillow-tk"; RL_PKG="python3-reportlab"
+fi
+
+# Repérer les modules manquants et cumuler les paquets correspondants
+TO_INSTALL=""
+python3 -c "import PyQt5.QtWidgets" &>/dev/null || TO_INSTALL="$TO_INSTALL $PYQT_PKG"
+python3 -c "import tkinter"          &>/dev/null || TO_INSTALL="$TO_INSTALL $TK_PKG"
+python3 -c "import PIL.ImageTk"      &>/dev/null || TO_INSTALL="$TO_INSTALL $PIL_PKG"
+python3 -c "import reportlab"        &>/dev/null || TO_INSTALL="$TO_INSTALL $RL_PKG"
+TO_INSTALL="$(echo $TO_INSTALL | xargs)"
+
+if [ -z "$TO_INSTALL" ]; then
+    echo "✅ Toutes les dépendances Python sont présentes"
+elif [ -z "$PKG_MGR" ]; then
+    zenity --warning --no-wrap --title="Dépendances Python manquantes" \
+        --text="Modules manquants : $TO_INSTALL\n\nGestionnaire de paquets non reconnu.\nInstallez ces paquets via votre distribution, puis relancez ART."
+else
+    echo "📦 Dépendances manquantes : $TO_INSTALL"
+    if zenity --question --no-wrap --title="Installer les dépendances Python ?" \
+        --text="ARTcompagnon doit installer :\n\n   $TO_INSTALL\n\nCommande :\n   $PKG_INSTALL $TO_INSTALL\n\n(le mot de passe administrateur vous sera demandé)\n\nContinuer ?"; then
+        [ "$PKG_MGR" = "apt" ] && sudo apt update
+        $PKG_INSTALL $TO_INSTALL
+    else
+        echo "ℹ️  Installation des dépendances ignorée par l'utilisateur"
+    fi
+    # PyQt5 est INDISPENSABLE au lancement de l'appli : re-vérifier
+    if python3 -c "import PyQt5.QtWidgets" &>/dev/null; then
+        echo "✅ PyQt5 opérationnel"
+    else
+        zenity --warning --no-wrap --title="PyQt5 toujours absent" \
+            --text="PyQt5 n'a pas pu être installé automatiquement.\n\nInstallez-le à la main :\n   $PKG_INSTALL $PYQT_PKG\n\nRepli universel (si le paquet distro manque) :\n   python3 -m pip install --user PyQt5"
+    fi
+fi
+echo ""
+
+# ============================================
+# ÉTAPE 7 : Vérification finale
 # ============================================
 echo "🔍 Vérification..."
 
@@ -123,7 +181,7 @@ else
 fi
 
 # ============================================
-# ÉTAPE 7 : Fenêtre de récap finale
+# ÉTAPE 8 : Fenêtre de récap finale
 # ============================================
 RECAP_MESSAGE="✅ ARTcompagnon installé avec succès!
 
