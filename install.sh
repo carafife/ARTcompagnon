@@ -107,9 +107,9 @@ echo "   ~/.config/ARTcompagnon/artcompagnon-config.json"
 echo ""
 
 # ============================================
-# ÉTAPE 6 : Vérifier / installer les dépendances Python
+# ÉTAPE 6 : Vérifier / installer les dépendances (Python + terminal)
 # ============================================
-echo "🐍 Vérification des dépendances Python..."
+echo "🐍 Vérification des dépendances (Python + gnome-terminal)..."
 
 # Détection du gestionnaire de paquets + noms de paquets adaptés à la distro
 PKG_MGR=""; PKG_INSTALL=""
@@ -138,6 +138,8 @@ python3 -c "import PyQt5.QtWidgets" &>/dev/null || TO_INSTALL="$TO_INSTALL $PYQT
 python3 -c "import tkinter"          &>/dev/null || TO_INSTALL="$TO_INSTALL $TK_PKG"
 python3 -c "import PIL.ImageTk"      &>/dev/null || TO_INSTALL="$TO_INSTALL $PIL_PKG"
 python3 -c "import reportlab"        &>/dev/null || TO_INSTALL="$TO_INSTALL $RL_PKG"
+# gnome-terminal : requis par les scripts (terminal de référence ; même nom de paquet partout)
+command -v gnome-terminal            &>/dev/null || TO_INSTALL="$TO_INSTALL gnome-terminal"
 TO_INSTALL="$(echo $TO_INSTALL | xargs)"
 
 if [ -z "$TO_INSTALL" ]; then
