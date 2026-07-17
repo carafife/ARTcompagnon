@@ -122,7 +122,7 @@ class SplashScreen(QDialog):
         layout.addWidget(logo_container)
         
         # Texte - sera animé
-        self.text_label = QLabel("v4.0 Stable - Powered by Carafife")
+        self.text_label = QLabel("v5.0 - Powered by Carafife")
         text_font = QFont("Sans", 14)
         text_font.setBold(True)
         self.text_label.setFont(text_font)
@@ -284,7 +284,7 @@ class ARTCompanion(QDialog):
         self.move(center_x, max(0, center_y))
     
     def init_ui(self):
-        self.setWindowTitle("Le ARTherapee Compagnon 🇫🇷 v4.0 Stable")
+        self.setWindowTitle("Le ARTherapee Compagnon 🇫🇷 v5.0")
         self.setGeometry(100, 100, 700, 580)
         self.setMinimumSize(700, 580)
         
