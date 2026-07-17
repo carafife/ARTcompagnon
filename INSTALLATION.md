@@ -1,200 +1,60 @@
-# 📖 Guide d'Installation - Le ARTherapee Compagnon v1.5.4
+# 📖 Installation — Le ARTherapee Compagnon
 
-## 🚀 Installation automatisée (recommandée)
+## 🚀 Installation (recommandée)
 
-### Étape 1 : Cloner le dépôt
 ```bash
 git clone https://github.com/carafife/ARTcompagnon.git
 cd ARTcompagnon
-./install.sh
+./demarrer.sh
 ```
 
-### Étape 2 : Lancer l'installation
-```bash
-./install.sh
-```
+`demarrer.sh` ouvre une fenêtre et vous guide en **2 étapes**.
 
-C'est tout ! Le script crée automatiquement :
-- ✅ Le fichier de configuration dans `~/.config/ART/usercommands/`
-- ✅ Les dossiers pour les scripts (`bash/`, `python/`, `lua/`)
-- ✅ Les dépendances Python (PyQt5, tkinter, Pillow, reportlab) : détectées et installées via le gestionnaire de paquets de votre distribution (dnf/apt/pacman/zypper)
+### Étape 1 — ART (`installer-art.sh`)
+Télécharge le **bundle officiel d'ART** (dernière version), qui inclut **déjà
+le CTL et l'OCIO**. Il est extrait dans `~/programs/`, et des liens `ART` et
+`ART-cli` sont créés dans `~/.local/bin`.
 
-> La liste manuelle ci-dessous n'est utile que si vous voulez installer les dépendances vous-même ou en cas de distribution non reconnue.
+> Si vous avez déjà un ART complet (avec CTL), le script le détecte et ne touche
+> à rien. Relancé plus tard, il met ART à jour vers la dernière version.
 
----
+### Étape 2 — Le Compagnon (`install.sh`)
+Met en place la configuration ART (éditeur externe) et installe les dépendances
+nécessaires — **PyQt5, tkinter, Pillow, reportlab, gnome-terminal** — via le
+gestionnaire de paquets de votre distribution (dnf/apt/pacman/zypper).
 
-## 📦 Prérequis
+*(Vous pouvez aussi lancer les scripts à la main : `./installer-art.sh` puis `./install.sh`.)*
 
-### ⚠️ Important
-**Le ARTherapee Compagnon fonctionne GARANTIE avec ART compilé uniquement.**
+## ▶️ Premier lancement
+1. Lancez **ART**.
+2. Menu **Éditeur externe** (ou clic droit dans le navigateur) → **Le ARTherapee Compagnon**.
+3. Onglet **Scripts ART** → **« Installer Pack »** pour récupérer la collection de scripts.
+4. Pour la **simulation de film (CTL)** : Préférences → Traitement de l'image →
+   **« Dossier CLUT »** = `~/.config/ART/ctlscripts`, puis **redémarrez ART**.
 
-ARTcompagnon ne fonctionne pas avec:
-- ❌ Flatpak (ART sandboxé)
-- ❌ AppImage (ART portable)
+## 🔧 Dépendances (référence)
+`install.sh` s'en charge automatiquement. Pour les installer vous-même :
 
-**Vous devez compiler ART depuis les sources.**
-
-### Système
-- **Linux** (Fedora, Ubuntu, Debian, etc.)
-- **ART compilé** (https://github.com/agriggio/art)
-
-### Logiciels
 ```bash
 # Fedora
-sudo dnf install python3 python3-qt5-base python3-tkinter python3-pillow python3-pillow-tk python3-reportlab git gnome-terminal
+sudo dnf install python3 python3-qt5-base python3-tkinter python3-pillow python3-pillow-tk python3-reportlab gnome-terminal git
 
-# Ubuntu/Debian
-sudo apt install python3 python3-pyqt5 python3-tk python3-pil python3-pil.imagetk python3-reportlab git gnome-terminal
+# Ubuntu / Debian
+sudo apt install python3 python3-pyqt5 python3-tk python3-pil python3-pil.imagetk python3-reportlab gnome-terminal git
 
-# Arch Linux
-sudo pacman -S python python-pyqt5 tk python-pillow python-reportlab git gnome-terminal
+# Arch
+sudo pacman -S python python-pyqt5 tk python-pillow python-reportlab gnome-terminal git
 ```
-
-### Python
-- Python 3.6+
-- PyQt5 5.15+
-
----
-
-## 🔧 Vérification de l'installation
-
-Après l'installation, vérifiez les dossiers créés :
-
-```bash
-# Dossier de configuration
-ls -la ~/.config/ART/usercommands/select-editor.txt
-
-# Dossiers des scripts (créés automatiquement au 1er lancement)
-ls -la ~/.config/ART/usercommands/bash/
-ls -la ~/.config/ART/usercommands/python/
-ls -la ~/.config/ART/usercommands/lua/
-```
-
----
-
-## 🎯 Premier lancement
-
-1. Lancez **ART**
-2. Ouvrez une image RAW
-3. Cliquez sur **"External Editor"** dans le menu (ou Ctrl+E)
-4. **Le ARTherapee Compagnon** s'ouvre ! 🎉
-
----
-
-## 📝 Ajouter vos scripts personnalisés
-
-### Méthode 1 : Depuis l'interface (recommandée)
-1. Ouvrez ARTcompagnon
-2. Cliquez sur **"📥 Charger un script"**
-3. Sélectionnez votre fichier (`.sh`, `.py`, `.lua`)
-4. ✅ Le script est automatiquement copié au bon endroit!
-
-### Méthode 2 : Copier manuellement
-
-**Scripts Bash :**
-```bash
-cp mon-script.sh ~/.config/ART/usercommands/bash/
-chmod +x ~/.config/ART/usercommands/bash/mon-script.sh
-```
-
-**Scripts Python :**
-```bash
-cp mon-script.py ~/.config/ART/usercommands/python/
-chmod +x ~/.config/ART/usercommands/python/mon-script.py
-```
-
-**Scripts Lua :**
-```bash
-cp mon-script.lua ~/.config/ART/usercommands/lua/
-```
-
----
-
-## 📋 Exemple de script Bash
-
-Créez `~/.config/ART/usercommands/bash/exemple.sh` :
-
-```bash
-#!/bin/bash
-# Script exemple : traiter une image
-IMAGE="$1"
-echo "Traitement de : $IMAGE"
-echo "✅ Terminé!"
-```
-
-Rendez-le exécutable :
-```bash
-chmod +x ~/.config/ART/usercommands/bash/exemple.sh
-```
-
----
-
-## 🔌 Configuration des éditeurs
-
-Le fichier `select-editor-config.json` contient vos éditeurs préférés :
-
-```json
-{
-  "editors": [
-    {
-      "name": "GIMP",
-      "description": "GNU Image Manipulation Program",
-      "command": "gimp"
-    },
-    {
-      "name": "Krita",
-      "description": "Digital Painting Application",
-      "command": "krita"
-    }
-  ]
-}
-```
-
-Vous pouvez :
-- ➕ **Ajouter** des éditeurs via l'interface (onglet "Éditeurs")
-- ➖ **Supprimer** des éditeurs via l'interface
-
----
 
 ## 🐛 Dépannage
-
-### Le programme ne démarre pas
-```bash
-# Vérifiez PyQt5
-python3 -c "import PyQt5; print('PyQt5 OK')"
-
-# Vérifiez les droits
-chmod +x ~/art-compagnon/select-editor.py
-```
-
-### Les scripts ne s'exécutent pas
-```bash
-# Vérifiez les droits (Bash et Python)
-chmod +x ~/.config/ART/usercommands/bash/*.sh
-chmod +x ~/.config/ART/usercommands/python/*.py
-
-# Vérifiez le shebang (Bash)
-head -1 ~/.config/ART/usercommands/bash/mon-script.sh
-# Doit commencer par: #!/bin/bash
-```
-
-### ART ne reconnaît pas le programme
-```bash
-# Vérifiez le fichier de config
-cat ~/.config/ART/usercommands/select-editor.txt
-
-# Relancez ART
-pkill ART
-ART &
-```
-
----
+- **Le Compagnon ne démarre pas** →
+  `python3 -c "import PyQt5.QtWidgets; print('PyQt5 OK')"`
+- **Mes scripts CTL n'apparaissent pas** → voir la fiche **« Vérifier le support
+  CTL »** : votre ART a-t-il le CTL ? le « Dossier CLUT » est-il réglé ? ART a-t-il
+  été redémarré ? (Le bundle officiel installé par `installer-art.sh` a le CTL.)
+- **« ART-cli : commande introuvable »** → `installer-art.sh` pose les liens dans
+  `~/.local/bin`. Vérifiez que ce dossier est dans votre `PATH`.
 
 ## 📞 Support
-
-- Problèmes ? Ouvrez une issue sur GitHub
-- Questions ? Consultez la documentation ART : https://github.com/agriggio/art
-
----
-
-**Bon traitement d'images ! 🎨**
+- Forum : https://forum.artherapee.fr
+- Dépôt : https://github.com/carafife/ARTcompagnon

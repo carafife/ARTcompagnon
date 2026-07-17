@@ -16,3 +16,11 @@ CONTEXT_PROMPT_v2.txt
 CONTEXT_PROMPT*.txt
 LISEZMOI_INTERNE.txt
 CONTEXT_PROMPT_*.txt
+Pack CTL ARTherapee/
+
+# Sauvegarde locale (ne pas publier)
+_vrac/
+
+# Runtime / local
+cache_config.json
+wip-dnglab/

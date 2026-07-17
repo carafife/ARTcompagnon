@@ -1,4 +1,0 @@
-[ART UserCommand]
-Label=Le ARTherapee Compagnon
-Command=/home/carafife/Programmes/ARTcompagnon/select-editor.py
-FileType=raw

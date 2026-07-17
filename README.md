@@ -4,75 +4,52 @@
 
 # 🎨 Le ARTherapee Compagnon
 
-Lanceur d'applications et de scripts pour ART (ARTherapee).
-
-**Version:** v2.0 | **Status:** Stable ✅
-
-Lanceur d'applications et de scripts pour ART (ARTherapee).
-
-**Version:** v2.0 | **Status:** Stable ✅
+Lanceur de scripts et d'éditeurs externes pour **ART**. Il s'ouvre depuis ART en
+éditeur externe et lance vos scripts **bash / python / lua / CTL** sur vos photos.
 
 ## 🌟 Caractéristiques
+- 🔧 Scripts multi-langages (Bash, Python, Lua, CTL)
+- 📋 Éditeurs externes (GIMP, Krita, RawTherapee, Hugin…)
+- 📂 Arborescence par type · 📸 multi-fichiers · 🌙 thèmes · 🇫🇷 🇬🇧 FR/EN
+- 📦 Packs de scripts en un clic
 
-- 📋 **Éditeurs externes** - GIMP, Krita, RawTherapee, Hugin, Lightzone, etc.
-- 🔧 **Scripts multi-langages** - Bash, Python, Lua
-- 📂 **Arborescence intelligente** - Organisation auto par type
-- 📸 **Multi-fichiers** - Sélectionnez plusieurs photos et lancez Hugin/HDR!
-- 🌙 **Thèmes dynamiques** - Défaut & Average
-- 🇫🇷 🇬🇧 **Multilingue** - Français & Anglais
-- 🚀 Installation simple
-
-## ⚠️ Prérequis
-
-**ART COMPILÉ OBLIGATOIRE** (pas Flatpak/AppImage)
-
-ARTcompagnon ne fonctionne que si ART est compilé depuis source.
-
-## 📦 Installation rapide
+## 📦 Installation
 
 ```bash
 git clone https://github.com/carafife/ARTcompagnon.git
 cd ARTcompagnon
-./install.sh
+./demarrer.sh
 ```
 
-Relancez ART!
+`demarrer.sh` ouvre une fenêtre qui vous guide, en **2 étapes** :
+
+1. **Installer ART** (`installer-art.sh`) — télécharge le **bundle officiel d'ART**,
+   qui inclut **déjà le CTL et l'OCIO** (nécessaires à la simulation de film).
+   *Si vous avez déjà un ART complet, il le détecte et ne touche à rien.*
+2. **Installer le Compagnon** (`install.sh`).
+
+*(Ou à la main : `./installer-art.sh` puis `./install.sh`.)*
+
+Ensuite : lancez **ART** → dans le Compagnon, onglet **Scripts ART** →
+**« Installer Pack »** pour récupérer la collection de scripts.
 
 ## 🎯 Utilisation
+- Depuis ART : **Éditeur externe** (ou clic droit dans le navigateur) →
+  **Le ARTherapee Compagnon**.
+- Onglet **Scripts ART** → choisir un script → **Exécuter**.
 
-### Lancer un éditeur
+## ⚙️ CTL / simulation de film
+Le bundle officiel d'ART inclut déjà le **CTL + OCIO**. Après l'installation,
+réglez le **« Dossier CLUT »** sur `~/.config/ART/ctlscripts`
+(Préférences → Traitement de l'image) puis **redémarrez ART**.
+Voir la fiche **« Vérifier le support CTL »** (dans le centre d'aide du Compagnon).
 
-**Option 1 - Bouton "Editeur externe"** (Preferences)
-- ART → Preferences → External Editor → Cliquez le bouton
-
-**Option 2 - Clic droit** (Navigateur fichiers)
-- Sélectionnez image(s) → Clic droit → Le ARTherapee Compagnon → Choisissez éditeur
-
-### Créer vos scripts
-
-**Bash** `~/.config/ART/usercommands/bash/mon_script.sh`
-```bash
-#!/bin/bash
-echo "Photo: $1"
-```
-
-**Python** `~/.config/ART/usercommands/python/mon_script.py`
-```python
-import sys
-print(f"Photo: {sys.argv[1]}")
-```
-
-**Lua** `~/.config/ART/usercommands/lua/mon_script.lua`
-```lua
-print("Photo: " .. arg[1])
-```
+## 🔄 Mise à jour
+- **ART** : relancez `./installer-art.sh` (il prend la dernière version).
+- **Le Compagnon** : `git pull` dans le dossier cloné, puis relancez `./install.sh`.
 
 ## 📚 Documentation
-
-- [INSTALLATION.md](INSTALLATION.md) - Installation ARTcompagnon
-- [PROJECT_ARCHITECTURE.md](PROJECT_ARCHITECTURE.md) - Architecture technique
-- [COMPLETE_SETUP_GUIDE_FR.md](COMPLETE_SETUP_GUIDE_FR.md) - Guide complet (ART + dépendances optionnelles)
+- [INSTALLATION.md](INSTALLATION.md) — installation détaillée & dépannage
 
 ## 📝 Licence
-
-MIT - Créé avec ❤️ par carafife
+MIT — Créé avec ❤️ par carafife

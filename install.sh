@@ -21,45 +21,43 @@ echo "   $SCRIPT_DIR"
 echo ""
 
 # ============================================
-# ÉTAPE 2 : Vérifier que ART est installé
+# ÉTAPE 2 : Vérifier la présence d'ART
 # ============================================
-echo "🔍 Recherche d'ART compilé..."
+echo "🔍 Recherche d'ART..."
 
-# Paramètre de test pour simuler l'absence d'ART
 if [ "$1" = "--test-no-art" ]; then
-    echo "🧪 MODE TEST: Simulation d'absence d'ART compilé"
+    echo "🧪 MODE TEST: Simulation d'absence d'ART"
     ART_FOUND="non"
-    echo "⚠️  ART compilé non détecté"
 else
-    # Détection normale
     ART_FOUND="non"
-    
     if command -v ART &> /dev/null; then
-        ART_FOUND="natif"
-        echo "✅ ART compilé trouvé (installation native)"
+        ART_FOUND="oui"
+        echo "✅ ART détecté : $(command -v ART)"
     elif command -v flatpak &> /dev/null && flatpak list --app 2>/dev/null | grep -q "us.pixls.art.ART"; then
         ART_FOUND="flatpak"
-        echo "⚠️  ART Flatpak détecté"
+        echo "⚠️  ART Flatpak détecté — non recommandé (sandbox)."
     else
-        ART_FOUND="non"
-        echo "⚠️  ART compilé non détecté"
+        echo "ℹ️  ART non trouvé dans le PATH (normal si tu lances le bundle/archive depuis son dossier)."
     fi
 fi
-
 echo ""
 
-# Si ART pas trouvé, afficher fenêtre de confirmation
+# Info CTL / OCIO — utile aux deux profils (bundle et compilation maison)
+echo "💡 CTL & simulation de film :"
+echo "   • Le bundle officiel d'ART inclut DÉJÀ le CTL + l'OCIO — rien à installer."
+echo "     (Le script  ./installer-art.sh  l'installe / le met à jour pour toi.)"
+echo "   • Si tu compiles ART toi-même : active ENABLE_CTL (voir la fiche « Vérifier le support CTL »)."
+echo ""
+
 if [ "$ART_FOUND" = "non" ]; then
-    zenity --question \
-        --title="Attention - ART compilé non détecté" \
-        --text="Vous n'avez pas d'ART compilé.\n\nCela n'empêche pas l'installation toutefois.\nEn fin d'installation, vous aurez des chemins\nde dossier à vérifier.\n\nVoulez-vous continuer ?" \
-        --no-wrap
-    
+    zenity --question --no-wrap \
+        --title="ART non détecté dans le PATH" \
+        --text="ART n'est pas dans le PATH.\n\nC'est NORMAL si tu utilises le bundle officiel (archive) lancé depuis son dossier : le Compagnon fonctionnera quand même.\n\n💡 Astuce : le script  ./installer-art.sh  (fourni à côté) installe ART avec le CTL et pose les liens nécessaires.\n\nContinuer l'installation du Compagnon ?"
     if [ $? -ne 0 ]; then
         echo "❌ Installation annulée par l'utilisateur"
         exit 0
     fi
-    echo "✅ L'utilisateur a choisi de continuer"
+    echo "✅ Poursuite de l'installation"
     echo ""
 fi
 
