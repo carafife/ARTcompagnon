@@ -31,6 +31,15 @@ warn(){ echo -e "${Y}!! ${N} $1"; }
 err(){  echo -e "${R}ERREUR${N} $1"; }
 has(){ command -v "$1" >/dev/null 2>&1; }
 
+# Confirmation oui/non (zenity si dispo, sinon terminal). Retourne 0 si "oui".
+ask_yes(){
+    if has zenity; then
+        zenity --question --no-wrap --title="$1" --text="$2" 2>/dev/null
+    else
+        echo -e "$2"; read -r -p "[o/N] " _r; case "$_r" in o|O|y|Y) return 0 ;; *) return 1 ;; esac
+    fi
+}
+
 dl(){ # url dest
     if   has curl; then curl -fSL "$1" -o "$2"
     elif has wget; then wget -O "$2" "$1"
@@ -120,6 +129,70 @@ tar -xf "$TMP/art.tar.xz" -C "$INSTALL_PARENT" || { err "Extraction echouee."; e
 ln -sf "${DEST}/ART"     "${BINDIR}/ART"
 ln -sf "${DEST}/ART-cli" "${BINDIR}/ART-cli"
 ok "Liens crees : ${BINDIR}/ART  et  ${BINDIR}/ART-cli"
+
+# --- Lanceur d'application (icone dans le menu, sans terminal) ---
+APPS="${HOME}/.local/share/applications"
+ICONS="${HOME}/.local/share/icons"
+mkdir -p "$APPS" "$ICONS"
+ICON="ART"
+for sz in 256 128 512 64 48; do
+    if [ -f "${DEST}/images/ART-logo-${sz}.png" ]; then
+        cp -f "${DEST}/images/ART-logo-${sz}.png" "${ICONS}/ART.png" && ICON="${ICONS}/ART.png"
+        break
+    fi
+done
+cat > "${APPS}/ART.desktop" <<EOF
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=ART
+GenericName=Éditeur RAW
+Comment=ARTherapee — développement photo RAW
+Exec=${BINDIR}/ART %F
+Icon=${ICON}
+Terminal=false
+Categories=Graphics;Photography;
+MimeType=image/x-canon-cr2;image/x-nikon-nef;image/x-sony-arw;image/tiff;image/jpeg;image/png;
+StartupNotify=true
+EOF
+chmod +x "${APPS}/ART.desktop"
+command -v update-desktop-database >/dev/null 2>&1 && update-desktop-database "$APPS" >/dev/null 2>&1
+ok "Lanceur créé : menu Applications → ART (clic pour lancer, sans terminal)"
+
+# --- Optionnel : proposer de supprimer d'ANCIENNES releases bundle ---
+# On ne propose JAMAIS de suppression automatique, et UNIQUEMENT des bundles
+# téléchargés par ce script (~/programs/ART-*-<arch>). Un ART compilé (ex.
+# /usr/local) n'est JAMAIS concerné. Ignoré en mode --yes (pas d'interaction).
+if [ "$ASSUME_YES" != "1" ]; then
+    mapfile -t _found < <(find "$INSTALL_PARENT" -maxdepth 1 -type d -name "ART-*-${ARCH_TAG}" 2>/dev/null)
+    OLD_BUNDLES=()
+    for _d in "${_found[@]}"; do [ "$_d" != "$DEST" ] && OLD_BUNDLES+=("$_d"); done
+    if [ "${#OLD_BUNDLES[@]}" -gt 0 ]; then
+        _LIST="$(printf '   %s\n' "${OLD_BUNDLES[@]}")"
+        if ask_yes "Nettoyer d'anciennes versions d'ART ?" \
+"D'anciennes versions du bundle ART ont été trouvées :
+
+$_LIST
+
+Voulez-vous les SUPPRIMER pour faire de la place ?
+
+Note : on ne supprime QUE ces releases téléchargées.
+Un ART que vous auriez compilé vous-même (ex. /usr/local)
+n'est JAMAIS touché."; then
+            if ask_yes "Confirmation" \
+"⚠️ Êtes-vous VRAIMENT sûr ? Cette suppression est IRRÉVERSIBLE.
+
+Dossiers qui seront supprimés :
+$_LIST"; then
+                for _d in "${OLD_BUNDLES[@]}"; do rm -rf "$_d" && ok "Supprimé : $_d"; done
+            else
+                info "Suppression annulée."
+            fi
+        else
+            info "Anciennes versions conservées."
+        fi
+    fi
+fi
 
 # --- ~/.local/bin dans le PATH ? ---
 case ":$PATH:" in
