@@ -12,11 +12,15 @@ cd ARTcompagnon
 
 ### Étape 1 — ART (`installer-art.sh`)
 Télécharge le **bundle officiel d'ART** (dernière version), qui inclut **déjà
-le CTL et l'OCIO**. Il est extrait dans `~/programs/`, et des liens `ART` et
-`ART-cli` sont créés dans `~/.local/bin`.
+le CTL et l'OCIO**. Il est extrait dans `~/programs/`, des liens `ART` et
+`ART-cli` sont créés dans `~/.local/bin`, et un **lanceur** est ajouté au menu
+Applications (icône ART, démarrage sans terminal).
 
-> Si vous avez déjà un ART complet (avec CTL), le script le détecte et ne touche
-> à rien. Relancé plus tard, il met ART à jour vers la dernière version.
+> - Si vous avez déjà un ART complet (avec CTL), le script le **détecte et ne
+>   touche à rien**. Relancé plus tard, il met ART à jour vers la dernière version.
+> - Si d'anciennes versions du **bundle** sont présentes dans `~/programs/`, il
+>   peut **proposer** de les supprimer — **toujours avec confirmation, jamais
+>   automatiquement**, et **jamais** un ART que vous auriez compilé vous-même.
 
 ### Étape 2 — Le Compagnon (`install.sh`)
 Met en place la configuration ART (éditeur externe) et installe les dépendances
